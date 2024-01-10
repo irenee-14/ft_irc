@@ -14,7 +14,7 @@
 
 #define BUF_SIZE 1000
 
-void error_handling(const std::string& message);
+// void error_handling(const std::string& message);
 void check_command(struct pollfd fds, char* buf, int str_len);
 
 int main(int argc, char* argv[]) {
@@ -63,57 +63,63 @@ int main(int argc, char* argv[]) {
   //  fds[0].events = POLLIN;
 
   /////////////////////////////////////////////
-  //  Server serv(argv);
-  //  while (true) {
-  //    std::vector<struct pollfd> *pollFds = serv.getPollFds();
-  //    int fd_num = poll(pollFds[0], serv.getPollFds().size(), -1);
-  //    if (fd_num == -1) {
-  //      error_handling("poll() error");
-  //    }
-  //    // server 소켓에 연결요청
-  //    if (fds[0].revents & POLLIN) {
-  //      if (fds[0].fd == serv_sock) {
-  //        adr_sz = sizeof(clnt_adr);
-  //        clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &adr_sz);
 
-  //        fds.push_back(pollfd());
-  //        fds.back().fd = clnt_sock;
-  //        fds.back().events = POLLIN;
+  Server serv(argv);
+  std::vector<struct pollfd> poll_fd;
+  poll_fd.push_back(pollfd());
+  poll_fd[0].fd = serv.getServFd();
+  poll_fd[0].events = POLLIN;
 
-  //        std::cout << "connected client: " << clnt_sock << std::endl;
+  while (true) {
+    // std::vector<struct pollfd> poll_fd = serv.getPollFds();
+    int fd_num = poll(poll_fd.data(), poll_fd.size(), -1);
+    if (fd_num == -1) {
+      error_handling("poll() error");
+    }
+    // server 소켓에 연결요청
+    if (poll_fd[0].revents & POLLIN) {
+      if (poll_fd[0].fd == serv.getServFd()) {
+        adr_sz = sizeof(clnt_adr);
+        clnt_sock =
+            accept(serv.getServFd(), (struct sockaddr*)&clnt_adr, &adr_sz);
 
-  //        const char* connected_msg = "server와 연결\n";
-  //        write(clnt_sock, connected_msg, strlen(connected_msg));
-  //      }
-  //      continue;
-  //    }
-  //    // client에서 온 요청
+        poll_fd.push_back(pollfd());
+        poll_fd.back().fd = clnt_sock;
+        poll_fd.back().events = POLLIN;
 
-  //    for (i = 1; i < (int)fds.size(); ++i) {
-  //      if (fds[i].revents & POLLIN) {
-  //        {
-  //          str_len = recv(fds[i].fd, buf, BUF_SIZE, 0);
-  //          // ctrl + D
-  //          if (str_len == 0) {
-  //            close(fds[i].fd);
-  //            fds.erase(fds.begin() + i);  // fds 벡터에서 해당 pollfd 제거
-  //            std::cout << "closed client: " << fds[i].fd << std::endl;
-  //          } else {
-  //            write(1, buf, str_len);
-  //            check_command(fds[i], buf, str_len);
-  //          }
-  //        }
-  //      }
-  //    }
-  //  }
-  //  close(serv_sock);
+        std::cout << "connected client: " << clnt_sock << std::endl;
+
+        const char* connected_msg = "server와 연결\n";
+        write(clnt_sock, connected_msg, strlen(connected_msg));
+      }
+      continue;
+    }
+    // client에서 온 요청
+    for (i = 1; i < (int)poll_fd.size(); ++i) {
+      if (poll_fd[i].revents & POLLIN) {
+        {
+          str_len = recv(poll_fd[i].fd, buf, BUF_SIZE, 0);
+          // ctrl + D
+          if (str_len == 0) {
+            close(poll_fd[i].fd);
+            poll_fd.erase(poll_fd.begin() + i);
+            std::cout << "closed client: " << poll_fd[i].fd << std::endl;
+          } else {
+            write(1, buf, str_len);
+            check_command(poll_fd[i], buf, str_len);
+          }
+        }
+      }
+    }
+  }
+  // close(serv_sock);
   return 0;
 }
 
-void error_handling(const std::string& message) {
-  std::cerr << message << std::endl;
-  exit(1);
-}
+// void error_handling(const std::string& message) {
+//   std::cerr << message << std::endl;
+//   exit(1);
+// }
 
 void check_command(struct pollfd fds, char* buf, int str_len) {
   if (buf[str_len - 1] == '\n' && buf[str_len - 2] == '\r') {

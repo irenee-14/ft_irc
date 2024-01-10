@@ -7,7 +7,8 @@ CXXFLAGS		=	-Wall -Wextra -Werror -std=c++98
 HEADER			=	./src
 
 SRCS_DIR		=	./src
-SRCS_FILES		=	main.cpp
+SRCS_FILES		=	main.cpp \
+					Server.cpp
 SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 
 OBJS			=	$(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)

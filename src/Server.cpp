@@ -3,9 +3,9 @@
 #include <arpa/inet.h>  // htons
 #include <fcntl.h>      //fcntl
 #include <sys/socket.h>
+#include <unistd.h>  // close
 
 #include <iostream>
-
 void error_handling(const std::string& message) {
   std::cerr << message << std::endl;
   exit(1);
@@ -14,7 +14,8 @@ void error_handling(const std::string& message) {
 Server::Server(void) {}
 
 Server::Server(char** argv) {
-  // 서버 소켓 생성 serv_sock = socket(PF_INET, SOCK_STREAM, 0);
+  // 서버 소켓 생성
+  serv_fd = socket(PF_INET, SOCK_STREAM, 0);
   if (this->serv_fd == -1) {
     error_handling("socket() error");
   }
@@ -42,13 +43,14 @@ Server::Server(char** argv) {
   if (listen(this->serv_fd, 5) == -1) {
     error_handling("listen() error");
   }
-  fds[0].fd = this->serv_fd;
-  fds[0].events = POLLIN;
+  // fds.push_back(pollfd());
+  // fds[0].fd = this->serv_fd;
+  // fds[0].events = POLLIN;
 }
 
 Server::Server(const Server& src) { *this = src; }
 
-Server::~Server(void) {}
+Server::~Server(void) { close(this->serv_fd); }
 
 Server& Server::operator=(Server const& rhs) {
   if (this != &rhs) {
@@ -57,7 +59,7 @@ Server& Server::operator=(Server const& rhs) {
   return (*this);
 }
 
-const int Server::getServFd() const { return (this->serv_fd); }
+int Server::getServFd() const { return (this->serv_fd); }
 
 const std::vector<struct pollfd> Server::getPollFds() const {
   return (this->fds);

@@ -20,8 +20,9 @@ class Server {
   Server(char** argv);
   ~Server(void);
 
-  const int getServFd() const;
+  int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
 };
 
+void error_handling(const std::string& message);
 #endif
