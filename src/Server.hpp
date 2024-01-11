@@ -12,6 +12,8 @@ class Server {
   struct sockaddr_in serv_adr;
   std::vector<struct pollfd> fds;
 
+  unsigned int password;
+
   Server(void);
   Server(const Server& src);
   Server& operator=(Server const& rhs);
@@ -22,7 +24,10 @@ class Server {
 
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
+
+  void acceptLoop();
 };
 
-void error_handling(const std::string& message);
+void check_command(struct pollfd fds, char* buf, int str_len);
+
 #endif
