@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
     serv.acceptLoop();
   } catch (std::string exception) {
     std::cout << "Error : " << exception << std::endl;
+    return (1);
   }
   return (0);
 }

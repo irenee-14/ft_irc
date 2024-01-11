@@ -96,7 +96,7 @@ void Server::acceptLoop() {
 
     // client에서 온 요청
     for (unsigned int i = 1; i < fds.size(); ++i) {
-      if (fds[i].revents & POLLHUP)  // POLLHUP : 연결 끊어짐
+      if (fds[i].revents & (POLLHUP | POLLERR))  // POLLHUP : 연결 끊어짐
       {
         close(fds[i].fd);
         fds.erase(fds.begin() + i);

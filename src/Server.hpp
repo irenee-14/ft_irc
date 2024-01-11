@@ -1,5 +1,5 @@
-#ifndef Server_HPP
-#define Server_HPP
+#ifndef __SERVER_HPP__
+#define __SERVER_HPP__
 
 #include <netinet/in.h>  //struct sockaddr_in
 #include <sys/poll.h>    // struct pollfd
