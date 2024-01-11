@@ -11,8 +11,10 @@ class Server {
   int serv_fd;
   struct sockaddr_in serv_adr;
   std::vector<struct pollfd> fds;
-
   unsigned int password;
+
+  // clients
+  // channels
 
   Server(void);
   Server(const Server& src);
