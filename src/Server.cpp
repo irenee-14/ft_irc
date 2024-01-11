@@ -155,8 +155,8 @@ QUIT : IRC 서버에서 나가기
 NOTICE
 LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
 PING : 클라이언트-서버 간의 연결을 확인
-OPER : 관리자 권한을 얻는다.
-KICK : 유저를 특정 채널에서 내보낸다.
+OPER : 관리자 권한을 얻기
+KICK : 유저를 특정 채널에서 내보내기
 */
 
 void check_command(struct pollfd fds, char* buf, int str_len) {
