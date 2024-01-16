@@ -6,6 +6,7 @@
 
 #include <vector>
 
+class Client;
 class Server {
  private:
   int serv_fd;
@@ -14,6 +15,7 @@ class Server {
   unsigned int password;
 
   // clients
+  std::vector<Client> clients;
   // channels
 
   Server(void);
