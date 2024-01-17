@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <sstream>
 
 #include "Client.hpp"
 
@@ -119,6 +120,7 @@ void Server::acceptLoop() {
         //    fds.erase(fds.begin() + i);
         //    std::cout << "closed client: " << fds[i].fd << std::endl;
         //  } else
+        buf[str_len] = '\0';
         {
           write(1, buf, str_len);
           check_command(fds[i], buf, str_len);
@@ -168,13 +170,17 @@ KICK : 유저를 특정 채널에서 내보내기
 */
 
 std::vector<std::string> split_command(std::string str) {
-  std::istringstream iss(str);
+  std::istringstream iss;
   std::vector<std::string> tokens;
+
+  iss.str(str);
 
   std::string token;
   while (iss >> token) {
     tokens.push_back(token);
   }
+
+  iss.str("");
   return (tokens);
 }
 
@@ -217,8 +223,12 @@ void Server::check_command(struct pollfd fds, char* buf, int str_len) {
                 << clients[fds.fd].getServerName() << " "
                 << clients[fds.fd].getRealName() << std::endl;
 
-      const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
-      send(fds.fd, se, strlen(se), 0);
+      // const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
+      std::string se = ":" + clients[fds.fd].getServerName() + " 001 " +
+                       clients[fds.fd].getNick() + " :Welcome\r\n";
+      std::cout << se << std::endl;
+      const char* se2 = se.c_str();
+      send(fds.fd, se2, strlen(se2), 0);
       //  continue;
     } else {
       // command랑 인자로 나누기
@@ -235,12 +245,39 @@ void Server::check_command(struct pollfd fds, char* buf, int str_len) {
         // const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
         // send(fds.fd, se, strlen(se), 0);
       } else if (str.find("JOIN") == 0) {
-        const char* se = ":jihyunlim!jihyunlim@127.0.0.1 JOIN :#channel\r\n";
-        send(fds.fd, se, strlen(se), 0);
+        std::string se = ":" + clients[fds.fd].getNick() + "!" +
+                         clients[fds.fd].getUser() + " JOIN :#channel\r\n";
+        std::cout << se << std::endl;
+        const char* se2 = se.c_str();
+        send(fds.fd, se2, strlen(se2), 0);
       } else if (str.find("PART") == 0) {
-        const char* se = ":jihyunlim!jihyunlim@127.0.0.1 PART :#channel\r\n";
-        send(fds.fd, se, strlen(se), 0);
+        std::string se = ":" + clients[fds.fd].getNick() + "!" +
+                         clients[fds.fd].getUser() + " PART :#channel\r\n";
+        std::cout << se << std::endl;
+        const char* se2 = se.c_str();
+        send(fds.fd, se2, strlen(se2), 0);
+      } else if (str.find("userhost") == 0) {
+        std::vector<std::string> tokens = split_command(str);
+        std::string se = ":" + clients[fds.fd].getServerName() + " 302 " +
+                         clients[fds.fd].getNick() + " :";
+        for (unsigned int i = 1; i < tokens.size(); ++i) {
+          se += clients[fds.fd].getNick() + "=+" +
+                clients[fds.fd].getUser() + "@" +
+                clients[fds.fd].getServerName() + " ";
+        }
+        se += "\r\n";
+        std::cout << se << std::endl;
+        const char* se2 = se.c_str();
+        send(fds.fd, se2, strlen(se2), 0);
+      } else if (str.find("QUIT") == 0) {
+        std::string se = "ERROR :Closing link: (" + clients[fds.fd].getUser() +
+                         "@" + clients[fds.fd].getServerName() +
+                         ") [Quit: leaving]\r\n";
+        std::cout << se << std::endl;
+        const char* se2 = se.c_str();
+        send(fds.fd, se2, strlen(se2), 0);
       }
+      
     }
   }
 

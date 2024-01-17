@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/joyoo/goinfre/ft_irc/src",
+      "program": "/Users/joyoo/goinfre/ft_irc/src/build/Debug/outDebug"
+    }
+  ]
+}
