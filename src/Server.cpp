@@ -119,9 +119,10 @@ void Server::acceptLoop() {
         //    fds.erase(fds.begin() + i);
         //    std::cout << "closed client: " << fds[i].fd << std::endl;
         //  } else
+        buf[str_len++] = '\0';
         {
           write(1, buf, str_len);
-          check_command(fds[i], buf, str_len);
+          check_command(fds[i], buf);
           write(1, "\n--check--\n\n", 12);
         }
       }
@@ -133,7 +134,7 @@ void Server::acceptLoop() {
 // 커맨드 분류
 // 커맨드 따라서 필요한 인자 확인
 // 커맨드 별 보내야 할 메시지 파악하기
-// 처음 접속 시 ":127.0.0.1 001 jihyunlim :Welcome\r\n" 등의 연결 확인 코드
+// 처음 접속 시 ":127.0.0.1 001 jihylim :Welcome\r\n" 등의 연결 확인 코드
 // 보내기
 
 /*
@@ -167,83 +168,77 @@ OPER : 관리자 권한을 얻기
 KICK : 유저를 특정 채널에서 내보내기
 */
 
-std::vector<std::string> split_command(std::string str) {
-  std::istringstream iss(str);
-  std::vector<std::string> tokens;
+std::vector<std::string> splitCommand(const std::string& str) {
+  std::vector<std::string> result;
+  std::string temp;
+  bool hasColon = false;
 
-  std::string token;
-  while (iss >> token) {
-    tokens.push_back(token);
+  std::stringstream ss(str);
+  char c;
+
+  while (ss.get(c)) {
+    if (c == ':') {
+      hasColon = true;
+      if (!temp.empty()) {
+        result.push_back(temp);
+        temp.clear();
+      }
+    } else if (c == ' ' && !hasColon) {
+      result.push_back(temp);
+      temp.clear();
+    } else
+      temp += c;
   }
-  return (tokens);
+  if (!temp.empty()) result.push_back(temp);
+
+  return (result);
 }
 
-void Server::check_command(struct pollfd fds, char* buf, int str_len) {
-  //  std::string buffer(buf, str_len);  // 버퍼 내용을 문자열로 저장
+void Server::check_command(struct pollfd fds, char* buf) {
+  std::stringstream ss(buf);
+  std::string line;
 
-  //  if (!buffer.empty()) {
-  //  std::stringstream ss(buffer);
-  std::string str(buf);
+  while (std::getline(ss, line)) {
+    if (line.c_str()[line.length() - 1] == '\r') {
+      std::string str = line.substr(0, line.find("\r"));
+      std::cout << "\ninput : " << str << std::endl;
+      if (str.find("CAP LS") == 0) {
+        const char* se = "CAP * LS\r\n";
+        send(fds.fd, se, strlen(se), 0);
+        // write(1, se, strlen(se));
+        //  break;
+      } else if (str.find("CAP END") == 0 || str.find("JOIN :") == 0) {
+        std::cout << "cap end or join" << std::endl;
 
-  //  while (std::getline(ss, str)) {
-  if (buf[str_len - 2] == '\r' && buf[str_len - 1] == '\n') {
-    if (str.find("CAP LS") == 0) {
-      const char* se = "CAP * LS\r\n";
-      send(fds.fd, se, strlen(se), 0);
-      // write(1, se, strlen(se));
-      //  break;
-    } else if (str.find("CAP END") == 0) {
-      //  const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
-      //  send(fds.fd, se, strlen(se), 0);
-      // 처음 들어왔을 때
-      std::stringstream ss(str);
-      std::string line;
+      } else {
+        std::vector<std::string> tokens = splitCommand(str);
 
-      while (std::getline(ss, line)) {
-        std::vector<std::string> user_token = split_command(line);
-        if (user_token[0] == "CAP") {
-          continue;
-        } else if (user_token[0] == "NICK") {
-          clients[fds.fd].setNick(user_token[1]);
-        } else if (user_token[0] == "USER") {
-          clients[fds.fd].setUser(user_token[1]);
-          clients[fds.fd].setServerName(user_token[3]);
-          clients[fds.fd].setRealName(user_token[4]);
-          // write(1, "user in\n", 10);
+        if (tokens[0] == "NICK") {
+          clients[fds.fd].setNick(tokens[1]);
+        } else if (tokens[0] == "USER") {
+          clients[fds.fd].setUser(tokens[1]);
+          clients[fds.fd].setServerName(tokens[3]);
+          clients[fds.fd].setRealName(tokens[4]);
+
+          std::cout << "결과 : " << clients[fds.fd].getNick() << " "
+                    << clients[fds.fd].getUser() << " "
+                    << clients[fds.fd].getServerName() << " "
+                    << clients[fds.fd].getRealName() << std::endl;
+          // 다 받은거 확인되면 welcome
+          // 아니면 에러 띄우고 종료?
+          const char* se = ":127.0.0.1 001 jihylim :Welcome\r\n";
+          send(fds.fd, se, strlen(se), 0);
+        } else if (str.find("JOIN") == 0) {
+          const char* se = ":jihylim!jihylim@127.0.0.1 JOIN :#channel\r\n";
+          send(fds.fd, se, strlen(se), 0);
+        } else if (str.find("PART") == 0) {
+          const char* se = ":jihylim!jihylim@127.0.0.1 PART :#channel\r\n";
+          send(fds.fd, se, strlen(se), 0);
+        } else {
+          const char* se = ":127.0.0.1 \r\n";
+          send(fds.fd, se, strlen(se), 0);
         }
-      }
-      std::cout << "결과 : " << clients[fds.fd].getNick() << " "
-                << clients[fds.fd].getUser() << " "
-                << clients[fds.fd].getServerName() << " "
-                << clients[fds.fd].getRealName() << std::endl;
-
-      const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
-      send(fds.fd, se, strlen(se), 0);
-      //  continue;
-    } else {
-      // command랑 인자로 나누기
-      // 인자 받아서 인자에 맞는 함수 실행
-
-      // std::vector<std::string> tokens = split_command(str);
-
-      if (str.find("NICK") == 0) {
-        // nickname 변경
-        // std::getline(ss, str);
-
-        // std::vector<std::string> user_token = split_command(str);
-
-        // const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
-        // send(fds.fd, se, strlen(se), 0);
-      } else if (str.find("JOIN") == 0) {
-        const char* se = ":jihyunlim!jihyunlim@127.0.0.1 JOIN :#channel\r\n";
-        send(fds.fd, se, strlen(se), 0);
-      } else if (str.find("PART") == 0) {
-        const char* se = ":jihyunlim!jihyunlim@127.0.0.1 PART :#channel\r\n";
-        send(fds.fd, se, strlen(se), 0);
       }
     }
   }
-
-  //  }
-  (void)str_len;
 }
