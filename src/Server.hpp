@@ -7,6 +7,8 @@
 #include <map>
 #include <vector>
 
+#include "Utils.hpp"
+
 class Client;
 class Server {
  private:

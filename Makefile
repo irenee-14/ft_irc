@@ -9,7 +9,8 @@ HEADER			=	./src
 SRCS_DIR		=	./src
 SRCS_FILES		=	main.cpp \
 					Server.cpp \
-					Client.cpp
+					Client.cpp \
+					Utils.cpp
 SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 
 OBJS			=	$(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
