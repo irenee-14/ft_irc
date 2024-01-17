@@ -8,7 +8,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <sstream>
 
 #include "Client.hpp"
 
@@ -120,10 +119,10 @@ void Server::acceptLoop() {
         //    fds.erase(fds.begin() + i);
         //    std::cout << "closed client: " << fds[i].fd << std::endl;
         //  } else
-        buf[str_len] = '\0';
+        buf[str_len++] = '\0';
         {
           write(1, buf, str_len);
-          check_command(fds[i], buf, str_len);
+          checkCommand(fds[i], buf);
           write(1, "\n--check--\n\n", 12);
         }
       }
@@ -135,7 +134,7 @@ void Server::acceptLoop() {
 // 커맨드 분류
 // 커맨드 따라서 필요한 인자 확인
 // 커맨드 별 보내야 할 메시지 파악하기
-// 처음 접속 시 ":127.0.0.1 001 jihyunlim :Welcome\r\n" 등의 연결 확인 코드
+// 처음 접속 시 ":127.0.0.1 001 jihylim :Welcome\r\n" 등의 연결 확인 코드
 // 보내기
 
 /*
@@ -169,140 +168,134 @@ OPER : 관리자 권한을 얻기
 KICK : 유저를 특정 채널에서 내보내기
 */
 
-std::vector<std::string> split_command(std::string str) {
-  std::istringstream iss;
-  std::vector<std::string> tokens;
+std::vector<std::string> splitCommand(const std::string& str) {
+  std::vector<std::string> result;
+  std::string temp;
+  bool hasColon = false;
 
-  iss.str(str);
+  std::stringstream ss(str);
+  char c;
 
-  std::string token;
-  while (iss >> token) {
-    tokens.push_back(token);
+  while (ss.get(c)) {
+    if (c == ':') {
+      hasColon = true;
+      if (!temp.empty()) {
+        result.push_back(temp);
+        temp.clear();
+      }
+    } else if (c == ' ' && !hasColon) {
+      result.push_back(temp);
+      temp.clear();
+    } else
+      temp += c;
   }
+  if (!temp.empty()) result.push_back(temp);
 
-  iss.str("");
-  return (tokens);
+  return (result);
 }
 
-void Server::check_command(struct pollfd fds, char* buf, int str_len) {
-  //  std::string buffer(buf, str_len);  // 버퍼 내용을 문자열로 저장
+void Server::checkCommand(struct pollfd fds, char* buf) {
+  std::stringstream ss(buf);
+  std::string line;
 
-  //  if (!buffer.empty()) {
-  //  std::stringstream ss(buffer);
-  std::string str(buf);
+  while (std::getline(ss, line)) {
+    if (line.c_str()[line.length() - 1] == '\r') {
+      std::string str = line.substr(0, line.find("\r"));
+      std::cout << "\ninput : " << str << std::endl;
+      if (str.find("CAP LS") == 0) {
+        const char* se = "CAP * LS\r\n";
+        send(fds.fd, se, strlen(se), 0);
+        // write(1, se, strlen(se));
+        //  break;
+      } else if (str.find("CAP END") == 0 || str.find("JOIN :") == 0) {
+        std::cout << "cap end or join" << std::endl;
 
-  //  while (std::getline(ss, str)) {
-  if (buf[str_len - 2] == '\r' && buf[str_len - 1] == '\n') {
-    if (str.find("CAP LS") == 0) {
-      const char* se = "CAP * LS\r\n";
-      send(fds.fd, se, strlen(se), 0);
-      // write(1, se, strlen(se));
-      //  break;
-    } else if (str.find("CAP END") == 0) {
-      //  const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
-      //  send(fds.fd, se, strlen(se), 0);
-      // 처음 들어왔을 때
-      std::stringstream ss(str);
-      std::string line;
+      } else {
+        std::vector<std::string> tokens = splitCommand(str);
 
-      while (std::getline(ss, line)) {
-        std::vector<std::string> user_token = split_command(line);
-        if (user_token[0] == "CAP") {
-          continue;
-        } else if (user_token[0] == "NICK") {
-          clients[fds.fd].setNick(user_token[1]);
-        } else if (user_token[0] == "USER") {
-          clients[fds.fd].setUser(user_token[1]);
-          clients[fds.fd].setServerName(user_token[3]);
-          clients[fds.fd].setRealName(user_token[4]);
+        if (tokens[0] == "NICK") {
+          clients[fds.fd].setNick(tokens[1]);
+        } else if (tokens[0] == "USER") {
+          clients[fds.fd].setUser(tokens[1]);
+          clients[fds.fd].setServerName(tokens[3]);
+          clients[fds.fd].setRealName(tokens[4]);
+
+          std::cout << "결과 : " << clients[fds.fd].getNick() << " "
+                    << clients[fds.fd].getUser() << " "
+                    << clients[fds.fd].getServerName() << " "
+                    << clients[fds.fd].getRealName() << std::endl;
+          // 다 받은거 확인되면 welcome
+          // 아니면 에러 띄우고 종료?
+          // const char* se = ":127.0.0.1 001 jihylim :Welcome\r\n";
+          std::string se = ":" + clients[fds.fd].getServerName() + " 001 " +
+                           clients[fds.fd].getNick() + " :Welcome\r\n";
+          const char* se2 = se.c_str();
+          send(fds.fd, se2, strlen(se2), 0);
+        } else if (str.find("JOIN") == 0) {
+          std::string se = ":" + clients[fds.fd].getNick() + "!" +
+                           clients[fds.fd].getUser() + " JOIN :#channel\r\n";
+          const char* se2 = se.c_str();
+          send(fds.fd, se2, strlen(se2), 0);
+        } else if (str.find("PART") == 0) {
+          std::string se = ":" + clients[fds.fd].getNick() + "!" +
+                           clients[fds.fd].getUser() + " PART :#channel\r\n";
+          std::cout << se << std::endl;
+          const char* se2 = se.c_str();
+          send(fds.fd, se2, strlen(se2), 0);
+        } else if (str.find("userhost") == 0) {
+          std::vector<std::string> tokens = splitCommand(str);
+          std::string se = ":" + clients[fds.fd].getServerName() + " 302 " +
+                           clients[fds.fd].getNick() + " :";
+          for (unsigned int i = 1; i < tokens.size(); ++i) {
+            se += clients[fds.fd].getNick() + "=+" + clients[fds.fd].getUser() +
+                  "@" + clients[fds.fd].getServerName() + " ";
+          }
+          se += "\r\n";
+          std::cout << se << std::endl;
+          const char* se2 = se.c_str();
+          send(fds.fd, se2, strlen(se2), 0);
+        } else if (str.find("PRIVMSG") == 0) {
+        }
+        // PRIVMSG : 특정 사용자 또는 채널에 메시지를 보내기
+        else if (str.find("NOTICE") == 0) {
+        }
+        // NOTICE : PRIVMSG와 비슷하지만, 서버가 보낸 메시지에 대한 응답을 보낼
+        // 때 사용
+        else if (str.find("LIST") == 0) {
+        }
+        // LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
+        else if (str.find("PING") == 0) {
+        }
+        // PING : 클라이언트-서버 간의 연결을 확인
+        else if (str.find("OPER") == 0) {
+        }
+        // OPER : 관리자 권한을 얻기
+        else if (str.find("KICK") == 0) {
+        }
+        // KICK : 유저를 특정 채널에서 내보내기
+        else if (str.find("INVITE") == 0) {
+        }
+        // INVITE : 특정 채널로 유저 초대
+        else if (str.find("TOPIC") == 0) {
+        }
+        // TOPIC : 특정 채널의 주제 설정
+        else if (str.find("MODE") == 0) {
+        }
+        // MODE : 채널의 모드 설정
+        // - i : 초대 전용 채널 설정/제거
+        // - t : 채널 운영자에 대한 TOPIC 명령 제한 설정/제거
+        // - k : 채널키(비밀번호) 설정/제거
+        // - o : 채널 운영자 권한 부여/받기
+        // - l: 채널에 대한 사용자 제한을 설정/해제
+        else if (str.find("QUIT") == 0) {
+          std::string se =
+              "ERROR :Closing link: (" + clients[fds.fd].getUser() + "@" +
+              clients[fds.fd].getServerName() + ") [Quit: leaving]\r\n";
+          std::cout << se << std::endl;
+          const char* se2 = se.c_str();
+          send(fds.fd, se2, strlen(se2), 0);
         }
       }
-      std::cout << "결과 : " << clients[fds.fd].getNick() << " "
-                << clients[fds.fd].getUser() << " "
-                << clients[fds.fd].getServerName() << " "
-                << clients[fds.fd].getRealName() << std::endl;
-
-      // const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
-      std::string se = ":" + clients[fds.fd].getServerName() + " 001 " +
-                       clients[fds.fd].getNick() + " :Welcome\r\n";
-      std::cout << se << std::endl;
-      const char* se2 = se.c_str();
-      send(fds.fd, se2, strlen(se2), 0);
-      //  continue;
-    } else {
-      // command랑 인자로 나누기
-      // 인자 받아서 인자에 맞는 함수 실행
-
-      // std::vector<std::string> tokens = split_command(str);
-
-      if (str.find("NICK") == 0) {
-        // nickname 변경
-        // std::getline(ss, str);
-
-        // std::vector<std::string> user_token = split_command(str);
-
-        // const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
-        // send(fds.fd, se, strlen(se), 0);
-      } else if (str.find("JOIN") == 0) {
-        std::string se = ":" + clients[fds.fd].getNick() + "!" +
-                         clients[fds.fd].getUser() + " JOIN :#channel\r\n";
-        std::cout << se << std::endl;
-        const char* se2 = se.c_str();
-        send(fds.fd, se2, strlen(se2), 0);
-      } else if (str.find("PART") == 0) {
-        std::string se = ":" + clients[fds.fd].getNick() + "!" +
-                         clients[fds.fd].getUser() + " PART :#channel\r\n";
-        std::cout << se << std::endl;
-        const char* se2 = se.c_str();
-        send(fds.fd, se2, strlen(se2), 0);
-      } else if (str.find("userhost") == 0) {
-        std::vector<std::string> tokens = split_command(str);
-        std::string se = ":" + clients[fds.fd].getServerName() + " 302 " +
-                         clients[fds.fd].getNick() + " :";
-        for (unsigned int i = 1; i < tokens.size(); ++i) {
-          se += clients[fds.fd].getNick() + "=+" +
-                clients[fds.fd].getUser() + "@" +
-                clients[fds.fd].getServerName() + " ";
-        }
-        se += "\r\n";
-        std::cout << se << std::endl;
-        const char* se2 = se.c_str();
-        send(fds.fd, se2, strlen(se2), 0);
-      } else if (str.find("PRIVMSG") == 0) {}
-      // PRIVMSG : 특정 사용자 또는 채널에 메시지를 보내기
-      else if (str.find("NOTICE") == 0) {}
-      // NOTICE : PRIVMSG와 비슷하지만, 서버가 보낸 메시지에 대한 응답을 보낼 때 사용
-      else if (str.find("LIST") == 0) {}
-      // LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
-      else if (str.find("PING") == 0) {}
-      // PING : 클라이언트-서버 간의 연결을 확인
-      else if (str.find("OPER") == 0) {}
-      // OPER : 관리자 권한을 얻기
-      else if (str.find("KICK") == 0) {}
-      // KICK : 유저를 특정 채널에서 내보내기
-      else if (str.find("INVITE") == 0) {}
-      // INVITE : 특정 채널로 유저 초대
-      else if (str.find("TOPIC") == 0) {}
-      // TOPIC : 특정 채널의 주제 설정
-      else if (str.find("MODE") == 0) {}
-      // MODE : 채널의 모드 설정
-      // - i : 초대 전용 채널 설정/제거
-      // - t : 채널 운영자에 대한 TOPIC 명령 제한 설정/제거
-      // - k : 채널키(비밀번호) 설정/제거
-      // - o : 채널 운영자 권한 부여/받기
-      // - l: 채널에 대한 사용자 제한을 설정/해제
-      else if (str.find("QUIT") == 0) {
-        std::string se = "ERROR :Closing link: (" + clients[fds.fd].getUser() +
-                         "@" + clients[fds.fd].getServerName() +
-                         ") [Quit: leaving]\r\n";
-        std::cout << se << std::endl;
-        const char* se2 = se.c_str();
-        send(fds.fd, se2, strlen(se2), 0);
-      }
-      
     }
   }
-
-  //  }
-  (void)str_len;
 }
