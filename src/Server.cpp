@@ -215,7 +215,6 @@ void Server::check_command(struct pollfd fds, char* buf, int str_len) {
           clients[fds.fd].setUser(user_token[1]);
           clients[fds.fd].setServerName(user_token[3]);
           clients[fds.fd].setRealName(user_token[4]);
-          // write(1, "user in\n", 10);
         }
       }
       std::cout << "결과 : " << clients[fds.fd].getNick() << " "
@@ -269,7 +268,30 @@ void Server::check_command(struct pollfd fds, char* buf, int str_len) {
         std::cout << se << std::endl;
         const char* se2 = se.c_str();
         send(fds.fd, se2, strlen(se2), 0);
-      } else if (str.find("QUIT") == 0) {
+      } else if (str.find("PRIVMSG") == 0) {}
+      // PRIVMSG : 특정 사용자 또는 채널에 메시지를 보내기
+      else if (str.find("NOTICE") == 0) {}
+      // NOTICE : PRIVMSG와 비슷하지만, 서버가 보낸 메시지에 대한 응답을 보낼 때 사용
+      else if (str.find("LIST") == 0) {}
+      // LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
+      else if (str.find("PING") == 0) {}
+      // PING : 클라이언트-서버 간의 연결을 확인
+      else if (str.find("OPER") == 0) {}
+      // OPER : 관리자 권한을 얻기
+      else if (str.find("KICK") == 0) {}
+      // KICK : 유저를 특정 채널에서 내보내기
+      else if (str.find("INVITE") == 0) {}
+      // INVITE : 특정 채널로 유저 초대
+      else if (str.find("TOPIC") == 0) {}
+      // TOPIC : 특정 채널의 주제 설정
+      else if (str.find("MODE") == 0) {}
+      // MODE : 채널의 모드 설정
+      // - i : 초대 전용 채널 설정/제거
+      // - t : 채널 운영자에 대한 TOPIC 명령 제한 설정/제거
+      // - k : 채널키(비밀번호) 설정/제거
+      // - o : 채널 운영자 권한 부여/받기
+      // - l: 채널에 대한 사용자 제한을 설정/해제
+      else if (str.find("QUIT") == 0) {
         std::string se = "ERROR :Closing link: (" + clients[fds.fd].getUser() +
                          "@" + clients[fds.fd].getServerName() +
                          ") [Quit: leaving]\r\n";
