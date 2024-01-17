@@ -9,8 +9,6 @@
 #include <sstream>
 #include <string>
 
-#include "Client.hpp"
-
 #define BUF_SIZE 512
 
 void check_password(int pass) { (void)pass; }
@@ -236,15 +234,54 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
                            clients[fds.fd].getNick() + " :Welcome\r\n";
           sendString(se, fds.fd);
         } else if (str.find("JOIN") == 0) {
-          std::string se = ":" + clients[fds.fd].getNick() + "!" +
-                           clients[fds.fd].getUser() + " JOIN :#channel\r\n";
+          unsigned int i = 0;
 
-          sendString(se, fds.fd);
-        } else if (str.find("PART") == 0) {
-          std::string se = ":" + clients[fds.fd].getNick() + "!" +
-                           clients[fds.fd].getUser() + " PART :#channel\r\n";
+          std::string name = tokens[1].substr(1, tokens[1].size() - 1);
+          // std::cout << "name : " << name << std::endl;
 
-          sendString(se, fds.fd);
+          for (; i < channels.size(); i++) {
+            if (channels[i].getChannelName() == name) {
+              channels[i].addUser(fds.fd);
+              std::cout << "added!!!!!!!" << std::endl;
+              break;
+            }
+          }
+          if (i == channels.size()) {
+            // 채널 없으면 새로 만들기
+            channels.push_back(Channel(name));
+            channels[i].addUser(fds.fd);
+          }
+          std::string se = ":" + clients[fds.fd].getNick() + "!" +
+                           clients[fds.fd].getUser() + " JOIN :#" + name +
+                           "\r\n";
+          sendString(se, channels[i].getUsers());
+        }
+        // std::string se = ":" + clients[fds.fd].getNick() + "!" +
+        //                  clients[fds.fd].getUser() + " JOIN :#" + name +
+        //                  "\r\n";
+
+        // sendString(se, fds.fd);
+        // }
+        else if (str.find("PART") == 0) {
+          // 채널 나가는데 마지막이면 채널 없애기
+          std::string name = tokens[1].substr(1, tokens[1].size() - 1);
+          unsigned int i = 0;
+          for (; i < channels.size(); i++) {
+            if (channels[i].getChannelName() == name) {
+              break;
+            }
+          }
+          std::string se = ":" + clients[fds.fd].getNick() + "!" +
+                           clients[fds.fd].getUser() + " PART :#" + name +
+                           "\r\n";
+
+          sendString(se, channels[i].getUsers());
+          // users에서 지우기
+          channels[i].removeUser(fds.fd);
+          // users에서 빠지면서 채널에 아무도 없으면 채널 없애기
+          if (channels[i].getUsers().empty()) {
+            channels.erase(channels.begin() + i);
+          }
         } else if (str.find("userhost") == 0) {
           std::vector<std::string> tokens = splitCommand(str);
           std::string se = ":" + clients[fds.fd].getServerName() + " 302 " +
@@ -259,21 +296,28 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
         }
         // PRIVMSG : 특정 사용자 또는 채널에 메시지를 보내기
         else if (str.find("PRIVMSG") == 0) {
+          // 사용자에게 보내기
+          // 채널에 보내기 - 채널에 있는 유저에게 모두 보내기
         }
 
-        // NOTICE : PRIVMSG와 비슷하지만, 서버가 보낸 메시지에 대한 응답을 보낼
-        // 때 사용
+        // NOTICE : PRIVMSG와 비슷하지만, 서버가 보낸 메시지에 대한 응답을
+        // 보낼 때 사용
         else if (str.find("NOTICE") == 0) {
         }
         // LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
         else if (str.find("LIST") == 0) {
+          for (unsigned int j = 0; j < channels.size(); ++j) {
+            std::cout << channels[j].getChannelName() << " ";
+            for (unsigned int i = 0; i < channels[j].getUsers().size(); ++i) {
+              std::cout << channels[j].getUsers()[i];
+            }
+            std::cout << std::endl;
+          }
         }
 
         else if (str.find("PING") == 0) {
           const char* se = ":127.0.0.1 PONG 127.0.0.1 :127.0.0.1\r\n";
-
-          std::cout << se << std::endl;
-          send(fds.fd, se, strlen(se), 0);
+          sendString(se, fds.fd);
         }
         // OPER : 관리자 권한을 얻기
         else if (str.find("OPER") == 0) {

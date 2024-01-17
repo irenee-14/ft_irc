@@ -1,5 +1,7 @@
 #include "Channel.hpp"
 
+#include <iostream>
+
 Channel::Channel(void) {}
 
 Channel::Channel(std::string channel_name) : _channel_name(channel_name) {}
@@ -10,6 +12,7 @@ Channel::~Channel(void) {}
 
 Channel& Channel::operator=(Channel const& rhs) {
   if (this != &rhs) {
+    this->_channel_name = rhs._channel_name;
   }
   return (*this);
 }
@@ -48,7 +51,7 @@ int Channel::getNumUsers() const {
 void Channel::setChannelName(std::string channel_name) {
   this->_channel_name = channel_name;
 }
-void Channel::setUsers(std::vector<int> users) { this->_users = users; }
+
 void Channel::setMode(int index, int mode) {
   if (index < 0 || index > 4) return;
   this->_mode[index] = mode;
@@ -63,3 +66,11 @@ void Channel::setInviteList(std::vector<int> invite_list) {
   this->_invite_list = invite_list;
 }
 void Channel::setNumUsers(int num_users) { this->_num_users = num_users; }
+
+void Channel::addUser(int user) { this->_users.push_back(user); }
+
+void Channel::removeUser(int user) {
+  std::vector<int>::iterator it =
+      std::find(this->_users.begin(), this->_users.end(), user);
+  if (it != this->_users.end()) this->_users.erase(it);
+}

@@ -2,6 +2,7 @@
 #define __CHANNEL_HPP__
 
 #include <string>
+#include <vector>
 class Channel {
  private:
   std::string _channel_name;
@@ -15,12 +16,11 @@ class Channel {
   int _num_users;
 
   Channel(void);
-  Channel(const Channel& src);  // nu(es   // topics
-  Channel& operator=(Channel const& rhs);
 
  public:
-
+  Channel(const Channel& src);
   Channel(std::string channel_name);
+  Channel& operator=(Channel const& rhs);
   ~Channel(void);
 
   std::string getChannelName() const;
@@ -34,7 +34,7 @@ class Channel {
   int getNumUsers() const;
 
   void setChannelName(std::string channel_name);
-  void setUsers(std::vector<int> users);
+
   void setMode(int index, int mode);
   void setTopic(std::string topic);
   void setOperator(std::vector<int> op);
@@ -43,6 +43,8 @@ class Channel {
   void setInviteList(std::vector<int> invite_list);
   void setNumUsers(int num_users);
 
+  void addUser(int user);
+  void removeUser(int user);
 };
 
 #endif
