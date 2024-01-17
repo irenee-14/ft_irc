@@ -30,8 +30,7 @@ class Server {
   const std::vector<struct pollfd> getPollFds() const;
 
   void acceptLoop();
+  void check_command(struct pollfd fds, char* buf, int str_len);
 };
-
-void check_command(struct pollfd fds, char* buf, int str_len);
 
 #endif

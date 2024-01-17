@@ -133,7 +133,8 @@ void Server::acceptLoop() {
 // 커맨드 분류
 // 커맨드 따라서 필요한 인자 확인
 // 커맨드 별 보내야 할 메시지 파악하기
-// 처음 접속 시 ":127.0.0.1 001 jihylim :Welcome\r\n" 등의 연결 확인 코드 보내기
+// 처음 접속 시 ":127.0.0.1 001 jihyunlim :Welcome\r\n" 등의 연결 확인 코드
+// 보내기
 
 /*
 --------------------------------------------
@@ -177,7 +178,7 @@ std::vector<std::string> split_command(std::string str) {
   return (tokens);
 }
 
-void check_command(struct pollfd fds, char* buf, int str_len) {
+void Server::check_command(struct pollfd fds, char* buf, int str_len) {
   //  std::string buffer(buf, str_len);  // 버퍼 내용을 문자열로 저장
 
   //  if (!buffer.empty()) {
@@ -189,59 +190,64 @@ void check_command(struct pollfd fds, char* buf, int str_len) {
     if (str.find("CAP LS") == 0) {
       const char* se = "CAP * LS\r\n";
       send(fds.fd, se, strlen(se), 0);
-      write(1, se, strlen(se));
+      // write(1, se, strlen(se));
       //  break;
     } else if (str.find("CAP END") == 0) {
-      //  const char* se = ":127.0.0.1 001 jihylim :Welcome\r\n";
+      //  const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
       //  send(fds.fd, se, strlen(se), 0);
       // 처음 들어왔을 때
       std::stringstream ss(str);
       std::string line;
 
       while (std::getline(ss, line)) {
-        // std::cout << "읽은 줄 " << line << std::endl;
         std::vector<std::string> user_token = split_command(line);
-        // std::cout << "linwe : " << user_token[0] << std::endl;
         if (user_token[0] == "CAP") {
-          write(1, "cap in\n", 10);
+          continue;
         } else if (user_token[0] == "NICK") {
-          write(1, "nick in\n", 10);
+          clients.back().setNick(user_token[1]);
         } else if (user_token[0] == "USER") {
-          write(1, "user in\n", 10);
+          clients.back().setUser(user_token[1]);
+          clients.back().setServerName(user_token[3]);
+          clients.back().setRealName(user_token[4]);
+          // write(1, "user in\n", 10);
         }
       }
-      const char* se = ":127.0.0.1 001 jihylim :Welcome\r\n";
+      std::cout << "결과 : " << clients.back().getNick() << " "
+                << clients.back().getUser() << " "
+                << clients.back().getServerName() << " "
+                << clients.back().getRealName() << std::endl;
+      const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
       send(fds.fd, se, strlen(se), 0);
       //  continue;
     } else {
       // command랑 인자로 나누기
       // 인자 받아서 인자에 맞는 함수 실행
 
-      std::vector<std::string> tokens = split_command(str);
+      // std::vector<std::string> tokens = split_command(str);
 
-      if (tokens[0] == "NICK") {
+      if (str.find("NICK") == 0) {
         // nickname 변경
         // std::getline(ss, str);
 
         // std::vector<std::string> user_token = split_command(str);
 
-        const char* se = ":127.0.0.1 001 jihylim :Welcome\r\n";
-        send(fds.fd, se, strlen(se), 0);
+        // const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
+        // send(fds.fd, se, strlen(se), 0);
       } else if (str.find("JOIN") == 0) {
-        const char* se = ":jihylim!jihylim@127.0.0.1 JOIN :#channel\r\n";
+        const char* se = ":jihyunlim!jihyunlim@127.0.0.1 JOIN :#channel\r\n";
         send(fds.fd, se, strlen(se), 0);
       } else if (str.find("PART") == 0) {
-        const char* se = ":jihylim!jihylim@127.0.0.1 PART :#channel\r\n";
+        const char* se = ":jihyunlim!jihyunlim@127.0.0.1 PART :#channel\r\n";
         send(fds.fd, se, strlen(se), 0);
       }
       // if (str.find("NICK") == 0) {
-      //   const char* se = ":jihylim!jihylim@127.0.0.1 JOIN :#channel\r\n";
+      //   const char* se = ":jihyunlim!jihyunlim@127.0.0.1 JOIN :#channel\r\n";
       //   send(fds.fd, se, strlen(se), 0);
       // } else if (str.find("JOIN") == 0) {
-      //   const char* se = ":jihylim!jihylim@127.0.0.1 JOIN :#channel\r\n";
+      //   const char* se = ":jihyunlim!jihyunlim@127.0.0.1 JOIN :#channel\r\n";
       //   send(fds.fd, se, strlen(se), 0);
       // } else if (str.find("PART") == 0) {
-      //   const char* se = ":jihylim!jihylim@127.0.0.1 PART :#channel\r\n";
+      //   const char* se = ":jihyunlim!jihyunlim@127.0.0.1 PART :#channel\r\n";
       //   send(fds.fd, se, strlen(se), 0);
       // }
       //  }
