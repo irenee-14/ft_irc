@@ -4,8 +4,10 @@
 #include <netinet/in.h>  //struct sockaddr_in
 #include <sys/poll.h>    // struct pollfd
 
+#include <map>
 #include <vector>
 
+class Client;
 class Server {
  private:
   int serv_fd;
@@ -14,6 +16,7 @@ class Server {
   unsigned int password;
 
   // clients
+  std::map<int, Client> clients;
   // channels
 
   Server(void);
@@ -28,8 +31,7 @@ class Server {
   const std::vector<struct pollfd> getPollFds() const;
 
   void acceptLoop();
+  void check_command(struct pollfd fds, char* buf, int str_len);
 };
-
-void check_command(struct pollfd fds, char* buf, int str_len);
 
 #endif
