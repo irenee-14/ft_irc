@@ -7,7 +7,10 @@
 #include <map>
 #include <vector>
 
-class Client;
+#include "Channel.hpp"
+#include "Client.hpp"
+#include "Utils.hpp"
+
 class Server {
  private:
   int serv_fd;
@@ -18,6 +21,7 @@ class Server {
   // clients
   std::map<int, Client> clients;
   // channels
+  std::vector<Channel> channels;
 
   Server(void);
   Server(const Server& src);
