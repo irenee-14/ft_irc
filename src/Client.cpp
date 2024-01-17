@@ -11,6 +11,10 @@ Client::~Client(void) {}
 Client& Client::operator=(Client const& rhs) {
   if (this != &rhs) {
     _clnt_fd = rhs._clnt_fd;
+    _nick = rhs._nick;
+    _user = rhs._user;
+    _real_name = rhs._real_name;
+    _server_name = rhs._server_name;
   }
   return (*this);
 }

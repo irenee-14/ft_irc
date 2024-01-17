@@ -90,7 +90,7 @@ void Server::acceptLoop() {
         fds.back().events = POLLIN;
 
         // 클라이언트 새로 생성 후 fd 할당
-        clients.push_back(Client(clnt_sock));
+        clients[clnt_sock] = Client(clnt_sock);
 
         std::cout << "connected client: " << clnt_sock << std::endl;
 
@@ -204,18 +204,19 @@ void Server::check_command(struct pollfd fds, char* buf, int str_len) {
         if (user_token[0] == "CAP") {
           continue;
         } else if (user_token[0] == "NICK") {
-          clients.back().setNick(user_token[1]);
+          clients[fds.fd].setNick(user_token[1]);
         } else if (user_token[0] == "USER") {
-          clients.back().setUser(user_token[1]);
-          clients.back().setServerName(user_token[3]);
-          clients.back().setRealName(user_token[4]);
+          clients[fds.fd].setUser(user_token[1]);
+          clients[fds.fd].setServerName(user_token[3]);
+          clients[fds.fd].setRealName(user_token[4]);
           // write(1, "user in\n", 10);
         }
       }
-      std::cout << "결과 : " << clients.back().getNick() << " "
-                << clients.back().getUser() << " "
-                << clients.back().getServerName() << " "
-                << clients.back().getRealName() << std::endl;
+      std::cout << "결과 : " << clients[fds.fd].getNick() << " "
+                << clients[fds.fd].getUser() << " "
+                << clients[fds.fd].getServerName() << " "
+                << clients[fds.fd].getRealName() << std::endl;
+
       const char* se = ":127.0.0.1 001 jihyunlim :Welcome\r\n";
       send(fds.fd, se, strlen(se), 0);
       //  continue;
@@ -240,17 +241,6 @@ void Server::check_command(struct pollfd fds, char* buf, int str_len) {
         const char* se = ":jihyunlim!jihyunlim@127.0.0.1 PART :#channel\r\n";
         send(fds.fd, se, strlen(se), 0);
       }
-      // if (str.find("NICK") == 0) {
-      //   const char* se = ":jihyunlim!jihyunlim@127.0.0.1 JOIN :#channel\r\n";
-      //   send(fds.fd, se, strlen(se), 0);
-      // } else if (str.find("JOIN") == 0) {
-      //   const char* se = ":jihyunlim!jihyunlim@127.0.0.1 JOIN :#channel\r\n";
-      //   send(fds.fd, se, strlen(se), 0);
-      // } else if (str.find("PART") == 0) {
-      //   const char* se = ":jihyunlim!jihyunlim@127.0.0.1 PART :#channel\r\n";
-      //   send(fds.fd, se, strlen(se), 0);
-      // }
-      //  }
     }
   }
 

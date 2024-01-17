@@ -4,6 +4,7 @@
 #include <netinet/in.h>  //struct sockaddr_in
 #include <sys/poll.h>    // struct pollfd
 
+#include <map>
 #include <vector>
 
 class Client;
@@ -15,7 +16,7 @@ class Server {
   unsigned int password;
 
   // clients
-  std::vector<Client> clients;
+  std::map<int, Client> clients;
   // channels
 
   Server(void);

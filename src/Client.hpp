@@ -14,13 +14,12 @@ class Client {
   std::string _real_name;
   std::string _server_name;
 
-  Client(void);
-  Client& operator=(Client const& rhs);
-
  public:
+  Client(void);
   Client(int fd);
   Client(const Client& src);
   ~Client(void);
+  Client& operator=(Client const& rhs);
 
   void setFd(const int fd);
   void setNick(const std::string nick);
