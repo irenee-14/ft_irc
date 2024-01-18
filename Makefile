@@ -8,9 +8,10 @@ HEADER			=	./src
 
 SRCS_DIR		=	./src
 SRCS_FILES		=	main.cpp \
-					Server.cpp \
-					Client.cpp \
 					Channel.cpp \
+					Client.cpp \
+					Command.cpp \
+					Server.cpp \
 					Utils.cpp
 SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 

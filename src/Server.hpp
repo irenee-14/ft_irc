@@ -5,6 +5,7 @@
 #include <sys/poll.h>    // struct pollfd
 
 #include <map>
+#include <string>
 #include <vector>
 
 #include "Channel.hpp"
@@ -36,6 +37,23 @@ class Server {
 
   void acceptLoop();
   void checkCommand(struct pollfd fds, char* buf);
+
+  // ------------------------ command ------------------------ //
+
+  void nick(int fd, std::string token);
+  void user(int fd, std::vector<std::string> tokens);
+  void userhost(int fd, std::vector<std::string> tokens);
+  void pong(int fd);
+  void list(void);
+  // ********************************************************* //
+
+  void join(int fd, std::string token);
+  void part(int fd, std::string token);
+
+  // ********************************************************* //
+
+  void quit(int fd);
+  // -------------------------------------------------------- //
 };
 
 #endif
