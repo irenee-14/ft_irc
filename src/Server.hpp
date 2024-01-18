@@ -13,6 +13,21 @@
 #include "Client.hpp"
 #include "Utils.hpp"
 
+enum e_cmd {
+  NICK,
+  USER,
+  USERHOST,
+  PING,
+  PONG,
+  JOIN,
+  PART,
+  LIST,
+  QUIT,
+  PRIVMSG,
+  NOTICE,
+  UNKNOWN
+};
+
 class Server {
  private:
   int serv_fd;
@@ -43,7 +58,7 @@ class Server {
   void user(int fd, std::vector<std::string> tokens);
   void userhost(int fd, std::vector<std::string> tokens);
   void pong(int fd);
-  void list(int fd);
+  void list(int fd, std::string token);
   void quit(int fd);
 
   // ------------------- cmdInChannel -------------------- //
@@ -51,7 +66,9 @@ class Server {
   void join(int fd, std::string token);
   std::string userList(Channel& channel);
   void part(int fd, std::string token);
-  void msg(int fd, std::vector<std::string> token);
+  void msg(int fd, std::vector<std::string> token, std::string cmd);
+  void notice(int fd, std::vector<std::string> token);
+  void privateMsg(int fd, std::vector<std::string> token);
 };
 
 #endif

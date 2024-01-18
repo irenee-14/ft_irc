@@ -3,11 +3,11 @@
 #include "Server.hpp"
 
 void Server::nick(int fd, std::string token) {
-  clients[fd].setNick(token);
-
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " NICK :" + token +
                    "\r\n";
+
+  clients[fd].setNick(token);
 
   sendString(se, fd);
 }
@@ -56,17 +56,34 @@ void Server::pong(int fd) {
 // **************************
 // 채널 옵션 받아와서 출력 할 것
 // 채널 토픽 받아와서 출력 할 것
-void Server::list(int fd) {
+
+void Server::list(int fd, std::string rawToken) {
   std::string se = ":" + clients[fd].getServerName() + " 321 " +
                    clients[fd].getNick() + " Channel :Users Name\r\n";
+  // LIST #channel
+  // # 제거하고 채널 이름과 비교해서 채널 정보 출력
+  if (rawToken.size() > 0) {
+    std::string token = rawToken.substr(1, rawToken.size() - 1);
 
-  for (unsigned int i = 0; i < channels.size(); ++i) {
-    se += ":" + clients[fd].getServerName() + " 322 " + clients[fd].getNick() +
-          " #" + channels[i].getChannelName() + " " +
-          std::to_string(channels[i].getUsers().size()) + " :[+" +
-          channels[i].getModes() + "]\r\n";
+    for (unsigned int i = 0; i < channels.size(); ++i) {
+      if (channels[i].getChannelName() == token) {
+        se += ":" + clients[fd].getServerName() + " 322 " +
+              clients[fd].getNick() + " #" + channels[i].getChannelName() +
+              " " + std::to_string(channels[i].getUsers().size()) + " :[+" +
+              channels[i].getModes() + "]\r\n";
+      }
+    }
   }
-
+  // LIST
+  // 모든 채널 정보 출력
+  else {
+    for (unsigned int i = 0; i < channels.size(); ++i) {
+      se += ":" + clients[fd].getServerName() + " 322 " +
+            clients[fd].getNick() + " #" + channels[i].getChannelName() + " " +
+            std::to_string(channels[i].getUsers().size()) + " :[+" +
+            channels[i].getModes() + "]\r\n";
+    }
+  }
   se += ":" + clients[fd].getServerName() + " 323 " + clients[fd].getNick() +
         " :End of channel list.\r\n";
   sendString(se, fd);
