@@ -4,13 +4,14 @@ std::string Server::userList(Channel& channel) {
   std::string se = "";
 
   std::vector<int> users = channel.getUsers();
-  std::vector<int> ops = channel.getOperator();
+  std::vector<int> ops = channel.getOperators();
   std::cout << "users: " << users.size() << "ops : " << ops.size() << std::endl;
 
   for (unsigned int i = 0; i < users.size(); ++i) {
     std::vector<int>::iterator it = std::find(ops.begin(), ops.end(), users[i]);
     if (it != ops.end()) se += "@";
-    se += clients[users[i]].getNick() + " ";
+    se += clients[users[i]].getNick();
+    if (i != users.size() - 1) se += " ";
   }
   return (se);
 }
@@ -23,7 +24,6 @@ void Server::join(int fd, std::string token) {
   for (; i < channels.size(); i++) {
     if (channels[i].getChannelName() == name) {
       channels[i].addUser(fd);
-      std::cout << "added!!!!!!!" << std::endl;
       break;
     }
   }
@@ -72,3 +72,12 @@ void Server::part(int fd, std::string token) {
     channels.erase(channels.begin() + i);
   }
 }
+
+// ----------------------------------------------------------------------------
+
+//
+// void Server::msg(int fd, std::vector<std::string> token) {
+//   //
+//   (void)fd;
+//   (void)token;
+// }

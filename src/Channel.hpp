@@ -27,7 +27,7 @@ class Channel {
   std::vector<int> getUsers() const;
   int getMode(int index) const;
   std::string getTopic() const;
-  std::vector<int> getOperator() const;
+  std::vector<int> getOperators() const;
   std::vector<int> getBanList() const;
   std::string getKey() const;
   std::vector<int> getInviteList() const;
@@ -46,6 +46,7 @@ class Channel {
   void addUser(int user);
   void removeUser(int user);
   void addOperator(int user);
+  void removeOperator(int user);
 };
 
 #endif

@@ -37,7 +37,7 @@ std::string Channel::getTopic() const {
   if (this->_topic.empty()) return ("");
   return (this->_topic);
 }
-std::vector<int> Channel::getOperator() const {
+std::vector<int> Channel::getOperators() const {
   if (this->_operator.empty()) return (std::vector<int>());
   return (this->_operator);
 }
@@ -86,3 +86,9 @@ void Channel::removeUser(int user) {
 }
 
 void Channel::addOperator(int user) { this->_operator.push_back(user); }
+
+void Channel::removeOperator(int user) {
+  std::vector<int>::iterator it =
+      std::find(this->_operator.begin(), this->_operator.end(), user);
+  if (it != this->_operator.end()) this->_operator.erase(it);
+}
