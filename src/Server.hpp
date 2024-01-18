@@ -4,12 +4,14 @@
 #include <netinet/in.h>  //struct sockaddr_in
 #include <sys/poll.h>    // struct pollfd
 
+#include <iostream>
 #include <map>
+#include <string>
 #include <vector>
 
 #include "Channel.hpp"
 #include "Client.hpp"
-#include "Utils.hpp"
+#include "utils.hpp"
 
 class Server {
  private:
@@ -18,9 +20,7 @@ class Server {
   std::vector<struct pollfd> fds;
   unsigned int password;
 
-  // clients
   std::map<int, Client> clients;
-  // channels
   std::vector<Channel> channels;
 
   Server(void);
@@ -36,6 +36,23 @@ class Server {
 
   void acceptLoop();
   void checkCommand(struct pollfd fds, char* buf);
+
+  // ------------------------ command ------------------------ //
+
+  void nick(int fd, std::string token);
+  void user(int fd, std::vector<std::string> tokens);
+  void userhost(int fd, std::vector<std::string> tokens);
+  void pong(int fd);
+  void list(void);
+  // ********************************************************* //
+
+  void join(int fd, std::string token);
+  void part(int fd, std::string token);
+
+  // ********************************************************* //
+
+  void quit(int fd);
+  // -------------------------------------------------------- //
 };
 
 #endif
