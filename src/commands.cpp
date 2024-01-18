@@ -1,5 +1,4 @@
 #include <Server.hpp>
-#include <iostream>
 
 void Server::nick(int fd, std::string token) {
   clients[fd].setNick(token);
