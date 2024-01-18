@@ -51,6 +51,7 @@ class Server {
   void join(int fd, std::string token);
   std::string userList(Channel& channel);
   void part(int fd, std::string token);
+  void msg(int fd, std::vector<std::string> token);
 };
 
 #endif

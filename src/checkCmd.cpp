@@ -108,6 +108,7 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
 
         // PRIVMSG : 특정 사용자 또는 채널에 메시지를 보내기
         else if (str.find("PRIVMSG") == 0) {
+          msg(fds.fd, tokens);
           // 사용자에게 보내기
           // 채널에 보내기 - 채널에 있는 유저에게 모두 보내기
         }

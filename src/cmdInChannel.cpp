@@ -5,7 +5,8 @@ std::string Server::userList(Channel& channel) {
 
   std::vector<int> users = channel.getUsers();
   std::vector<int> ops = channel.getOperators();
-  std::cout << "users: " << users.size() << "ops : " << ops.size() << std::endl;
+  std::cout << "\nusers : " << users.size() << " ops : " << ops.size() << "\n"
+            << std::endl;
 
   for (unsigned int i = 0; i < users.size(); ++i) {
     std::vector<int>::iterator it = std::find(ops.begin(), ops.end(), users[i]);
@@ -75,9 +76,23 @@ void Server::part(int fd, std::string token) {
 
 // ----------------------------------------------------------------------------
 
-//
-// void Server::msg(int fd, std::vector<std::string> token) {
-//   //
-//   (void)fd;
-//   (void)token;
-// }
+void Server::msg(int fd, std::vector<std::string> token) {
+  // PRIVMSG #channelname :hello
+  // 채널에 속해있는 모든 유저에게 메시지 보내기
+  std::string name = token[1].substr(1, token[1].size() - 1);
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+                   "@" + clients[fd].getServerName() + " PRIVMSG " + token[1] +
+                   " :" + token[2] + "\r\n";
+  // 채널 이름으로 채널 찾기
+  unsigned int i = 0;
+  for (; i < channels.size(); i++) {
+    if (channels[i].getChannelName() == name) {
+      break;
+    }
+  }
+  std::vector<int> users = channels[i].getUsers();
+  users.erase(std::remove(users.begin(), users.end(), fd), users.end());
+  sendString(se, users);
+
+  // PRIVMSG target :babo
+}
