@@ -3,6 +3,10 @@
 
 #include <string>
 #include <vector>
+
+// mode enum
+enum { i = 0, k, l, n, t };
+
 class Channel {
  private:
   std::string _channel_name;
@@ -34,7 +38,6 @@ class Channel {
   int getNumUsers() const;
 
   void setChannelName(std::string channel_name);
-
   void setMode(int index, int mode);
   void setTopic(std::string topic);
   void setOperator(std::vector<int> op);
@@ -45,8 +48,11 @@ class Channel {
 
   void addUser(int user);
   void removeUser(int user);
+
   void addOperator(int user);
   void removeOperator(int user);
+
+  std::string getModes(void);
 };
 
 #endif

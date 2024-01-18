@@ -97,7 +97,7 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
           pong(fds.fd);
         // LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
         else if (str.find("LIST") == 0)
-          list();
+          list(fds.fd);
 
         // -------------------------------------------
         else if (str.find("JOIN") == 0)

@@ -52,14 +52,24 @@ void Server::pong(int fd) {
 
 // ------------------------------------------------------------------------------
 
-void Server::list(void) {
-  for (unsigned int j = 0; j < channels.size(); ++j) {
-    std::cout << channels[j].getChannelName() << " ";
-    for (unsigned int i = 0; i < channels[j].getUsers().size(); ++i) {
-      std::cout << channels[j].getUsers()[i];
-    }
-    std::cout << std::endl;
+// 채널 목록과 채널에 속한 user_num, 채널 옵션, 채널 주제 출력
+// **************************
+// 채널 옵션 받아와서 출력 할 것
+// 채널 토픽 받아와서 출력 할 것
+void Server::list(int fd) {
+  std::string se = ":" + clients[fd].getServerName() + " 321 " +
+                   clients[fd].getNick() + " Channel :Users Name\r\n";
+
+  for (unsigned int i = 0; i < channels.size(); ++i) {
+    se += ":" + clients[fd].getServerName() + " 322 " + clients[fd].getNick() +
+          " #" + channels[i].getChannelName() + " " +
+          std::to_string(channels[i].getUsers().size()) + " :[+" +
+          channels[i].getModes() + "]\r\n";
   }
+
+  se += ":" + clients[fd].getServerName() + " 323 " + clients[fd].getNick() +
+        " :End of channel list.\r\n";
+  sendString(se, fd);
 }
 
 // ------------------------------------------------------------------------------

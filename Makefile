@@ -14,7 +14,7 @@ SRCS_FILES		=	main.cpp \
 					checkCmd.cpp \
 					cmd.cpp \
 					cmdInChannel.cpp \
-					utils.cpp
+					Utils.cpp
 SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 
 OBJS			=	$(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)

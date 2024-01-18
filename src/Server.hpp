@@ -43,7 +43,7 @@ class Server {
   void user(int fd, std::vector<std::string> tokens);
   void userhost(int fd, std::vector<std::string> tokens);
   void pong(int fd);
-  void list(void);
+  void list(int fd);
   void quit(int fd);
 
   // ------------------- cmdInChannel -------------------- //
