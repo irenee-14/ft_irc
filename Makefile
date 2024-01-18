@@ -11,8 +11,9 @@ SRCS_FILES		=	main.cpp \
 					Channel.cpp \
 					Client.cpp \
 					Server.cpp \
-					checkCommand.cpp \
-					commands.cpp \
+					checkCmd.cpp \
+					cmd.cpp \
+					cmdInChannel.cpp \
 					utils.cpp
 SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 

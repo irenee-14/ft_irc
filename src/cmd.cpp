@@ -1,4 +1,6 @@
-#include <Server.hpp>
+#include <unistd.h>
+
+#include "Server.hpp"
 
 void Server::nick(int fd, std::string token) {
   clients[fd].setNick(token);
@@ -60,55 +62,7 @@ void Server::list(void) {
   }
 }
 
-// ****************************** in the channel *******************************
-
-void Server::join(int fd, std::string token) {
-  unsigned int i = 0;
-
-  std::string name = token.substr(1, token.size() - 1);
-  // std::cout << "name : " << name << std::endl;
-
-  for (; i < channels.size(); i++) {
-    if (channels[i].getChannelName() == name) {
-      channels[i].addUser(fd);
-      std::cout << "added!!!!!!!" << std::endl;
-      break;
-    }
-  }
-  if (i == channels.size()) {
-    // 채널 없으면 새로 만들기
-    channels.push_back(Channel(name));
-    channels[i].addUser(fd);
-  }
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
-                   " JOIN :#" + name + "\r\n";
-  sendString(se, channels[i].getUsers());
-}
-
 // ------------------------------------------------------------------------------
-
-void Server::part(int fd, std::string token) {
-  // 채널 나가는데 마지막이면 채널 없애기
-  std::string name = token.substr(1, token.size() - 1);
-  unsigned int i = 0;
-  for (; i < channels.size(); i++) {
-    if (channels[i].getChannelName() == name) {
-      break;
-    }
-  }
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
-                   " PART :#" + name + "\r\n";
-
-  sendString(se, channels[i].getUsers());
-  // users에서 지우기
-  channels[i].removeUser(fd);
-  // users에서 빠지면서 채널에 아무도 없으면 채널 없애기
-  if (channels[i].getUsers().empty()) {
-    channels.erase(channels.begin() + i);
-  }
-}
-
-// ******************************************************************************
 
 void Server::quit(int fd) {
   std::string se = "ERROR :Closing link: (" + clients[fd].getUser() + "@" +

@@ -13,12 +13,22 @@ Channel::~Channel(void) {}
 Channel& Channel::operator=(Channel const& rhs) {
   if (this != &rhs) {
     this->_channel_name = rhs._channel_name;
+    this->_users = rhs._users;
+    for (int i = 0; i < 5; i++) this->_mode[i] = rhs._mode[i];
+    this->_topic = rhs._topic;
+    this->_operator = rhs._operator;
+    this->_ban_list = rhs._ban_list;
+    this->_key = rhs._key;
+    this->_invite_list = rhs._invite_list;
+    this->_num_users = rhs._num_users;
   }
   return (*this);
 }
 
 std::string Channel::getChannelName() const { return (this->_channel_name); }
+
 std::vector<int> Channel::getUsers() const { return (this->_users); }
+
 int Channel::getMode(int index) const {
   if (index < 0 || index > 4) return (-1);
   return (this->_mode[index]);
@@ -74,3 +84,5 @@ void Channel::removeUser(int user) {
       std::find(this->_users.begin(), this->_users.end(), user);
   if (it != this->_users.end()) this->_users.erase(it);
 }
+
+void Channel::addOperator(int user) { this->_operator.push_back(user); }

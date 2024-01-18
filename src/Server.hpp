@@ -11,7 +11,7 @@
 
 #include "Channel.hpp"
 #include "Client.hpp"
-#include "utils.hpp"
+#include "Utils.hpp"
 
 class Server {
  private:
@@ -37,22 +37,20 @@ class Server {
   void acceptLoop();
   void checkCommand(struct pollfd fds, char* buf);
 
-  // ------------------------ command ------------------------ //
+  // ------------------------ cmd ------------------------ //
 
   void nick(int fd, std::string token);
   void user(int fd, std::vector<std::string> tokens);
   void userhost(int fd, std::vector<std::string> tokens);
   void pong(int fd);
   void list(void);
-  // ********************************************************* //
+  void quit(int fd);
+
+  // ------------------- cmdInChannel -------------------- //
 
   void join(int fd, std::string token);
+  std::string userList(Channel& channel);
   void part(int fd, std::string token);
-
-  // ********************************************************* //
-
-  void quit(int fd);
-  // -------------------------------------------------------- //
 };
 
 #endif
