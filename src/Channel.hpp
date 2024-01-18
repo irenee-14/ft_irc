@@ -45,6 +45,7 @@ class Channel {
 
   void addUser(int user);
   void removeUser(int user);
+  void addOperator(int user);
 };
 
 #endif
