@@ -124,3 +124,22 @@ void Server::privateMsg(int fd, std::vector<std::string> token) {
 void Server::notice(int fd, std::vector<std::string> token) {
   msg(fd, token, "NOTICE");
 }
+
+// KICK #hi root :bye
+// :root!root@127.0.0.1 KICK #hi root :bye
+
+void Server::kick(int fd, std::vector<std::string> token) {
+  std::string name = token[1].substr(1, token[1].size() - 1);
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+                   "@" + clients[fd].getServerName() + " KICK " + token[1] +
+                   " " + token[2] + " :" + token[3] + "\r\n";
+  // 채널 이름으로 채널 찾기
+  unsigned int i = 0;
+  for (; i < channels.size(); i++) {
+    if (channels[i].getChannelName() == name) {
+      break;
+    }
+  }
+
+  sendString(se, channels[i].getUsers());
+}

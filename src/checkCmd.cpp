@@ -84,6 +84,7 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
           notice(fds.fd, tokens);
         // KICK : 유저를 특정 채널에서 내보내기
         else if (str.find("KICK") == 0) {
+          kick(fds.fd, tokens);
         }
         // INVITE : 특정 채널로 유저 초대
         else if (str.find("INVITE") == 0) {

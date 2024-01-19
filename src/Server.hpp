@@ -71,6 +71,7 @@ class Server {
   void msg(int fd, std::vector<std::string> token, std::string cmd);
   void notice(int fd, std::vector<std::string> token);
   void privateMsg(int fd, std::vector<std::string> token);
+  void kick(int fd, std::vector<std::string> token);
 };
 
 #endif
