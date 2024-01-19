@@ -13,6 +13,7 @@ class Client {
   std::string _user;
   std::string _real_name;
   std::string _server_name;
+  const u_int32_t _timestamp;
 
  public:
   Client(void);
@@ -32,6 +33,7 @@ class Client {
   std::string getUser(void) const;
   std::string getRealName(void) const;
   std::string getServerName(void) const;
+  u_int32_t getTimestamp(void) const;
 };
 
 #endif

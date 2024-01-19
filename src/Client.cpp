@@ -1,10 +1,13 @@
 #include "Client.hpp"
 
-Client::Client(void) {}
+#include <time.h>
 
-Client::Client(int fd) : _clnt_fd(fd) {}
+#include <iostream>
+Client::Client(void) : _timestamp(time(0)) {}
 
-Client::Client(const Client& src) { *this = src; }
+Client::Client(int fd) : _clnt_fd(fd), _timestamp(time(0)) {}
+
+Client::Client(const Client& src) : _timestamp(time(0)) { *this = src; }
 
 Client::~Client(void) {}
 
@@ -32,3 +35,4 @@ std::string Client::getNick(void) const { return (_nick); }
 std::string Client::getUser(void) const { return (_user); }
 std::string Client::getRealName(void) const { return (_real_name); }
 std::string Client::getServerName(void) const { return (_server_name); }
+u_int32_t Client::getTimestamp(void) const { return (_timestamp); }

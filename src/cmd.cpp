@@ -88,7 +88,29 @@ void Server::list(int fd, std::string rawToken) {
         " :End of channel list.\r\n";
   sendString(se, fd);
 }
+// ------------------------------------------------------------------------------
 
+void Server::whois(int fd, std::string token) {
+  std::string se = ":" + clients[fd].getServerName() + " 311 " +
+                   clients[fd].getNick() + " " + token + " " +
+                   clients[fd].getUser() + " " + clients[fd].getServerName() +
+                   " * :" + clients[fd].getRealName() + "\r\n";
+  se += ":" + clients[fd].getServerName() + " 312 " + clients[fd].getNick() +
+        " " + token + " " + clients[fd].getServerName() +
+        " :Local IRC Server\r\n";
+
+  se += ":" + clients[fd].getServerName() + " 317 " + clients[fd].getNick() +
+        " " + token + " " +
+        std::to_string(time(0) - clients[fd].getTimestamp()) + " " +
+        std::to_string(clients[fd].getTimestamp()) +
+        " :seconds idle, signon "
+        "time\r\n";
+
+  se += ":" + clients[fd].getServerName() + " 318 " + clients[fd].getNick() +
+        " " + token + " :End of /WHOIS list.\r\n";
+
+  sendString(se, fd);
+}
 // ------------------------------------------------------------------------------
 
 void Server::quit(int fd) {
@@ -121,5 +143,3 @@ void Server::quit(int fd) {
 
   sendString(se, fd);
 }
-
-// ------------------------------------------------------------------------------

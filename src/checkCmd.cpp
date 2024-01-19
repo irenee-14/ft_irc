@@ -61,7 +61,8 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
         // LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
         else if (str.find("LIST") == 0)
           list(fds.fd, tokens[1]);
-
+        else if (str.find("WHOIS") == 0)
+          whois(fds.fd, tokens[1]);
         // -------------------------------------------
         else if (str.find("JOIN") == 0)
           join(fds.fd, tokens[1]);
@@ -77,10 +78,6 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
         // 보낼 때 사용
         else if (str.find("NOTICE") == 0)
           notice(fds.fd, tokens);
-
-        // OPER : 관리자 권한을 얻기
-        else if (str.find("OPER") == 0) {
-        }
         // KICK : 유저를 특정 채널에서 내보내기
         else if (str.find("KICK") == 0) {
         }

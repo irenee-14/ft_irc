@@ -59,6 +59,7 @@ class Server {
   void userhost(int fd, std::vector<std::string> tokens);
   void pong(int fd);
   void list(int fd, std::string token);
+  void whois(int fd, std::string token);
   void quit(int fd);
 
   // ------------------- cmdInChannel -------------------- //
