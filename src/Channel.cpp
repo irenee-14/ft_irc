@@ -12,7 +12,6 @@ Channel::Channel(std::string channel_name) : _channel_name(channel_name) {
   _mode[l] = 0;
   _topic = "";
   _key = "";
-  _num_users = 0;
 }
 
 Channel::Channel(const Channel& src) { *this = src; }
@@ -22,14 +21,13 @@ Channel::~Channel(void) {}
 Channel& Channel::operator=(Channel const& rhs) {
   if (this != &rhs) {
     this->_channel_name = rhs._channel_name;
-    this->_users = rhs._users;
+    this->_user_fds = rhs._user_fds;
     for (int i = 0; i < 5; i++) this->_mode[i] = rhs._mode[i];
     this->_topic = rhs._topic;
     this->_operator = rhs._operator;
     this->_ban_list = rhs._ban_list;
     this->_key = rhs._key;
     this->_invite_list = rhs._invite_list;
-    this->_num_users = rhs._num_users;
   }
   return (*this);
 }
@@ -37,7 +35,11 @@ Channel& Channel::operator=(Channel const& rhs) {
 // ------------------------------------------------------------------------------
 std::string Channel::getChannelName() const { return (this->_channel_name); }
 
-std::vector<int> Channel::getUsers() const { return (this->_users); }
+std::vector<int> Channel::getUserFds() const { return (this->_user_fds); }
+
+std::vector<std::string> Channel::getUserNicks() const {
+  return (this->_user_nicks);
+}
 
 int Channel::getMode(int index) const {
   if (index < 0 || index > 4) return (-1);
@@ -64,10 +66,6 @@ std::vector<int> Channel::getInviteList() const {
   if (this->_invite_list.empty()) return (std::vector<int>());
   return (this->_invite_list);
 }
-int Channel::getNumUsers() const {
-  if (this->_num_users < 0) return (-1);
-  return (this->_num_users);
-}
 
 // ------------------------------------------------------------------------------
 
@@ -88,17 +86,13 @@ void Channel::setKey(std::string key) { this->_key = key; }
 void Channel::setInviteList(std::vector<int> invite_list) {
   this->_invite_list = invite_list;
 }
-void Channel::setNumUsers(int num_users) { this->_num_users = num_users; }
-
 // ------------------------------------------------------------------------------
 
-void Channel::addUser(int user) { this->_users.push_back(user); }
-
-void Channel::removeUser(int user) {
-  std::vector<int>::iterator it =
-      std::find(this->_users.begin(), this->_users.end(), user);
-  if (it != this->_users.end()) this->_users.erase(it);
+void Channel::addUser(int user_fd, std::string user_nick) {
+  this->_user_fds.push_back(user_fd);
+  this->_user_nicks.push_back(user_nick);
 }
+
 // ------------------------------------------------------------------------------
 void Channel::addOperator(int user) { this->_operator.push_back(user); }
 
@@ -109,6 +103,7 @@ void Channel::removeOperator(int user) {
 }
 
 // ------------------------------------------------------------------------------
+
 std::string Channel::getModes(void) {
   std::string modes = "";
   if (this->_mode[i]) modes += "i";
@@ -118,4 +113,17 @@ std::string Channel::getModes(void) {
   if (this->_mode[t]) modes += "t";
 
   return (modes);
+}
+
+// ------------------------------------------------------------------------------
+
+// isOperator
+// 인자로 어느 채널인지 받아서 그 채널의 operator인지 확인
+// operator이면 true, 아니면 false
+
+bool Channel::isOperator(int fd) {
+  std::vector<int>::iterator it =
+      std::find(this->_operator.begin(), this->_operator.end(), fd);
+  if (it != this->_operator.end()) return (true);
+  return (false);
 }

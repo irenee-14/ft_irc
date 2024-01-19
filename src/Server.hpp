@@ -13,27 +13,14 @@
 #include "Client.hpp"
 #include "Utils.hpp"
 
-enum e_cmd {
-  NICK,
-  USER,
-  USERHOST,
-  PING,
-  PONG,
-  JOIN,
-  PART,
-  LIST,
-  QUIT,
-  PRIVMSG,
-  NOTICE,
-  UNKNOWN
-};
 
+enum command_enum{ NICK = 0, USER, USERHOST, PING, LIST, WHOIS, JOIN, PART, PRIVMSG, NOTICE, KICK, INVITE, TOPIC, MODE, QUIT};
 class Server {
  private:
   int serv_fd;
   struct sockaddr_in serv_adr;
   std::vector<struct pollfd> fds;
-  unsigned int password;
+  std::string password;
 
   std::map<int, Client> clients;
   std::vector<Channel> channels;
@@ -46,29 +33,43 @@ class Server {
   Server(char** argv);
   ~Server(void);
 
+  // -------------------------------------------------------------
+  static std::map<std::string, int> command_list;
+  static void initializeCommandList();
+
+  // ---------------------------------------------------------------
+
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
+
+  // -------------------------------------------------------------
 
   void acceptLoop();
   void checkCommand(struct pollfd fds, char* buf);
 
-  // ------------------------ cmd ------------------------ //
+  // ---------------------------- cmd ----------------------------
 
+  void pass(int fd, std::string token);
   void nick(int fd, std::string token);
   void user(int fd, std::vector<std::string> tokens);
   void userhost(int fd, std::vector<std::string> tokens);
   void pong(int fd);
   void list(int fd, std::string token);
+  void whois(int fd, std::string token);
   void quit(int fd);
 
-  // ------------------- cmdInChannel -------------------- //
+  // ----------------------- cmdInChannel -------------------------
 
   void join(int fd, std::string token);
   std::string userList(Channel& channel);
   void part(int fd, std::string token);
-  void msg(int fd, std::vector<std::string> token, std::string cmd);
-  void notice(int fd, std::vector<std::string> token);
-  void privateMsg(int fd, std::vector<std::string> token);
+
+  void msg(int fd, std::vector<std::string> tokens, std::string cmd);
+  void notice(int fd, std::vector<std::string> tokens);
+  void privateMsg(int fd, std::vector<std::string> tokens);
+
+  void kick(int fd, std::vector<std::string> tokens);
+  void topic(int fd, std::vector<std::string> tokens);
 };
 
 #endif

@@ -7,13 +7,12 @@
 
 #define BUF_SIZE 512
 
-void check_password(int pass) { (void)pass; }
-
-//*****************************
+// *****************************
 
 Server::Server(void) {}
 
 Server::Server(char** argv) {
+  this->password = argv[2];
   // 서버 소켓 생성
   serv_fd = socket(PF_INET, SOCK_STREAM, 0);
   if (this->serv_fd == -1) throw std::string("socket()");
@@ -59,7 +58,29 @@ Server& Server::operator=(Server const& rhs) {
   return (*this);
 }
 
-// --------------------------------------------------------------- //
+// ---------------------------------------------------------------
+
+std::map<std::string, int> Server::command_list;
+void Server::initializeCommandList() {
+  if (command_list.empty()) {
+    command_list["NICK"] = 0;
+    command_list["USER"] = 1;
+    command_list["userhost"] = 2;
+    command_list["PING"] = 3;
+    command_list["LIST"] = 4;
+    command_list["WHOIS"] = 5;
+    command_list["JOIN"] = 6;
+    command_list["PART"] = 7;
+    command_list["PRIVMSG"] = 8;
+    command_list["NOTICE"] = 9;
+    command_list["KICK"] = 10;
+    command_list["INVITE"] = 11;
+    command_list["TOPIC"] = 12;
+    command_list["MODE"] = 13;
+    command_list["QUIT"] = 14;
+  }
+}
+// ---------------------------------------------------------------
 
 int Server::getServFd() const { return (this->serv_fd); }
 
@@ -67,7 +88,7 @@ const std::vector<struct pollfd> Server::getPollFds() const {
   return (this->fds);
 }
 
-// --------------------------------------------------------------- //
+// ---------------------------------------------------------------
 
 void Server::acceptLoop() {
   while (true) {
@@ -91,11 +112,6 @@ void Server::acceptLoop() {
         clients[clnt_sock] = Client(clnt_sock);
 
         std::cout << "connected client: " << clnt_sock << std::endl;
-
-        const char* connected_msg = "server와 연결\n";
-        write(clnt_sock, connected_msg, strlen(connected_msg));
-
-        check_password(password);
       }
       continue;
     }
@@ -120,7 +136,18 @@ void Server::acceptLoop() {
         buf[str_len++] = '\0';
         {
           write(1, buf, str_len);
-          checkCommand(fds[i], buf);
+          try {
+            checkCommand(fds[i], buf);
+          } catch (std::string exception) {
+            // client에게도 에러 메시지 보내줘야함
+            std::string se =
+                "ERROR Closing link: [Access denied by configuration]\r\n";
+            sendString(se, fds[i].fd);
+
+            close(fds[i].fd);
+            fds.erase(fds.begin() + i);
+            std::cout << "closed client: " << fds[i].fd << std::endl;
+          }
           write(1, "\n--check--\n\n", 12);
         }
       }

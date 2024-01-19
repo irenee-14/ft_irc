@@ -38,69 +38,65 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
       if (str.find("CAP LS") == 0) {
         const char* se = "CAP * LS\r\n";
         send(fds.fd, se, strlen(se), 0);
-        // write(1, se, strlen(se));
-        //  break;
       } else if (str.find("CAP END") == 0 || str.find("JOIN :") == 0) {
         std::cout << "cap end or join" << std::endl;
 
       } else {
         std::vector<std::string> tokens = splitCommand(str);
-
-        if (tokens[0] == "NICK")
-          nick(fds.fd, tokens[1]);
-
-        else if (tokens[0] == "USER")
-          user(fds.fd, tokens);
-
-        else if (str.find("userhost") == 0)
-          userhost(fds.fd, tokens);
-
-        else if (str.find("PING") == 0)
-          pong(fds.fd);
-
-        // LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
-        else if (str.find("LIST") == 0)
-          list(fds.fd, tokens[1]);
-
-        // -------------------------------------------
-        else if (str.find("JOIN") == 0)
-          join(fds.fd, tokens[1]);
-
-        else if (str.find("PART") == 0)
-          part(fds.fd, tokens[1]);
-
-        // PRIVMSG : 특정 사용자 또는 채널에 메시지를 보내기
-        else if (str.find("PRIVMSG") == 0)
-          privateMsg(fds.fd, tokens);
-
-        // NOTICE : PRIVMSG와 비슷하지만, 서버가 보낸 메시지에 대한 응답을
-        // 보낼 때 사용
-        else if (str.find("NOTICE") == 0)
-          notice(fds.fd, tokens);
-
-        // OPER : 관리자 권한을 얻기
-        else if (str.find("OPER") == 0) {
+        if (tokens[0] == "PASS")
+          pass(fds.fd, tokens[1]);
+        else if (!clients[fds.fd].getPassFlag()) {
+          throw std::string("not pass");
         }
-        // KICK : 유저를 특정 채널에서 내보내기
-        else if (str.find("KICK") == 0) {
+
+        // token[0]을 command_list와 비교해서 switch문으로 처리
+        switch (Server::command_list[tokens[0]]) {
+          case NICK:
+            nick(fds.fd, tokens[1]);
+            break;
+          case USER:
+            user(fds.fd, tokens);
+            break;
+          case USERHOST:
+            userhost(fds.fd, tokens);
+            break;
+          case PING:
+            pong(fds.fd);
+            break;
+          case LIST:
+            list(fds.fd, tokens[1]);
+            break;
+          case WHOIS:
+            whois(fds.fd, tokens[1]);
+            break;
+          case JOIN:
+            join(fds.fd, tokens[1]);
+            break;
+          case PART:
+            part(fds.fd, tokens[1]);
+            break;
+          case PRIVMSG:
+            privateMsg(fds.fd, tokens);
+            break;
+          case NOTICE:
+            notice(fds.fd, tokens);
+            break;
+          case KICK:
+            kick(fds.fd, tokens);
+            break;
+          case INVITE:
+            break;
+          case TOPIC:
+            topic(fds.fd, tokens);
+            break;
+          case MODE:
+            break;
+          case QUIT:
+            quit(fds.fd);
+            break;
+          default:
+            break;
         }
-        // INVITE : 특정 채널로 유저 초대
-        else if (str.find("INVITE") == 0) {
-        }
-        // TOPIC : 특정 채널의 주제 설정
-        else if (str.find("TOPIC") == 0) {
-        }
-        // MODE : 채널의 모드 설정
-        // - i : 초대 전용 채널 설정/제거
-        // - t : 채널 운영자에 대한 TOPIC 명령 제한 설정/제거
-        // - k : 채널키(비밀번호) 설정/제거
-        // - o : 채널 운영자 권한 부여/받기
-        // - l: 채널에 대한 사용자 제한을 설정/해제
-        else if (str.find("MODE") == 0) {
-        }
-        // --------------------------------------------------
-        else if (str.find("QUIT") == 0)
-          quit(fds.fd);
       }
     }
   }
