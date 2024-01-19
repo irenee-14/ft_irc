@@ -91,6 +91,7 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
         }
         // TOPIC : 특정 채널의 주제 설정
         else if (str.find("TOPIC") == 0) {
+          topic(fds.fd, tokens);
         }
         // MODE : 채널의 모드 설정
         // - i : 초대 전용 채널 설정/제거
