@@ -7,7 +7,7 @@
 
 #define BUF_SIZE 512
 
-//*****************************
+// *****************************
 
 Server::Server(void) {}
 
@@ -58,7 +58,29 @@ Server& Server::operator=(Server const& rhs) {
   return (*this);
 }
 
-// --------------------------------------------------------------- //
+// ---------------------------------------------------------------
+
+std::map<std::string, int> Server::command_list;
+void Server::initializeCommandList() {
+  if (command_list.empty()) {
+    command_list["NICK"] = 0;
+    command_list["USER"] = 1;
+    command_list["userhost"] = 2;
+    command_list["PING"] = 3;
+    command_list["LIST"] = 4;
+    command_list["WHOIS"] = 5;
+    command_list["JOIN"] = 6;
+    command_list["PART"] = 7;
+    command_list["PRIVMSG"] = 8;
+    command_list["NOTICE"] = 9;
+    command_list["KICK"] = 10;
+    command_list["INVITE"] = 11;
+    command_list["TOPIC"] = 12;
+    command_list["MODE"] = 13;
+    command_list["QUIT"] = 14;
+  }
+}
+// ---------------------------------------------------------------
 
 int Server::getServFd() const { return (this->serv_fd); }
 
@@ -66,7 +88,7 @@ const std::vector<struct pollfd> Server::getPollFds() const {
   return (this->fds);
 }
 
-// --------------------------------------------------------------- //
+// ---------------------------------------------------------------
 
 void Server::acceptLoop() {
   while (true) {

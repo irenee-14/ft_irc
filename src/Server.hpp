@@ -13,21 +13,8 @@
 #include "Client.hpp"
 #include "Utils.hpp"
 
-enum e_cmd {
-  NICK,
-  USER,
-  USERHOST,
-  PING,
-  PONG,
-  JOIN,
-  PART,
-  LIST,
-  QUIT,
-  PRIVMSG,
-  NOTICE,
-  UNKNOWN
-};
 
+enum command_enum{ NICK = 0, USER, USERHOST, PING, LIST, WHOIS, JOIN, PART, PRIVMSG, NOTICE, KICK, INVITE, TOPIC, MODE, QUIT};
 class Server {
  private:
   int serv_fd;
@@ -47,6 +34,10 @@ class Server {
   ~Server(void);
 
   // -------------------------------------------------------------
+  static std::map<std::string, int> command_list;
+  static void initializeCommandList();
+
+  // ---------------------------------------------------------------
 
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
