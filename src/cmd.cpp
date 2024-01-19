@@ -2,6 +2,14 @@
 
 #include "Server.hpp"
 
+void Server::pass(int fd, std::string token) {
+  if (token != password) {
+    throw std::string("wrong password");
+  }
+  // fd에 해당하는 client의 pass_flag를 true로 바꿔줌
+  clients[fd].setPassFlag(true);
+}
+
 void Server::nick(int fd, std::string token) {
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " NICK :" + token +
@@ -25,7 +33,7 @@ void Server::user(int fd, std::vector<std::string> tokens) {
 
   // 다 받은거 확인되면 welcome
   // 아니면 에러 띄우고 종료?
-  // const char* se = ":127.0.0.1 001 jihylim :Welcome\r\n";
+  clients[fd].setTimestamp(time(0));
   std::string se = ":" + clients[fd].getServerName() + " 001 " +
                    clients[fd].getNick() + " :Welcome\r\n";
   sendString(se, fd);

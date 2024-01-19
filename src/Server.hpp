@@ -33,7 +33,7 @@ class Server {
   int serv_fd;
   struct sockaddr_in serv_adr;
   std::vector<struct pollfd> fds;
-  unsigned int password;
+  std::string password;
 
   std::map<int, Client> clients;
   std::vector<Channel> channels;
@@ -54,6 +54,7 @@ class Server {
 
   // ------------------------ cmd ------------------------ //
 
+  void pass(int fd, std::string token);
   void nick(int fd, std::string token);
   void user(int fd, std::vector<std::string> tokens);
   void userhost(int fd, std::vector<std::string> tokens);

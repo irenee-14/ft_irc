@@ -38,13 +38,17 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
       if (str.find("CAP LS") == 0) {
         const char* se = "CAP * LS\r\n";
         send(fds.fd, se, strlen(se), 0);
-        // write(1, se, strlen(se));
-        //  break;
       } else if (str.find("CAP END") == 0 || str.find("JOIN :") == 0) {
         std::cout << "cap end or join" << std::endl;
 
       } else {
         std::vector<std::string> tokens = splitCommand(str);
+
+        if (tokens[0] == "PASS")
+          pass(fds.fd, tokens[1]);
+        else if (!clients[fds.fd].getPassFlag()) {
+          throw std::string("not pass");
+        }
 
         if (tokens[0] == "NICK")
           nick(fds.fd, tokens[1]);
