@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 
 #include <string>
+
 class Client {
  private:
   int _clnt_fd;
@@ -23,6 +24,8 @@ class Client {
   ~Client(void);
   Client& operator=(Client const& rhs);
 
+  // ----------------------------------------------------
+
   void setFd(const int fd);
   void setNick(const std::string nick);
   void setUser(const std::string user);
@@ -30,6 +33,8 @@ class Client {
   void setServerName(const std::string server_name);
   void setPassFlag(const bool flag);
   void setTimestamp(const u_int32_t timestamp);
+
+  // ----------------------------------------------------
 
   int getFd(void) const;
   std::string getNick(void) const;

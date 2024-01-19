@@ -15,9 +15,10 @@ class Channel {
 
   int _mode[5];
   std::string _topic;
+  std::string _key;
+  
   std::vector<int> _operator;
   std::vector<int> _ban_list;
-  std::string _key;
   std::vector<int> _invite_list;
 
   Channel(void);
@@ -28,24 +29,37 @@ class Channel {
   Channel& operator=(Channel const& rhs);
   ~Channel(void);
 
+// ----------------------------------------------------
+
   std::string getChannelName() const;
   std::vector<int> getUserFds() const;
   std::vector<std::string> getUserNicks() const;
+
   int getMode(int index) const;
+   std::string getModes(void);
+
   std::string getTopic() const;
+  std::string getKey() const;
+
   std::vector<int> getOperators() const;
   std::vector<int> getBanList() const;
-  std::string getKey() const;
   std::vector<int> getInviteList() const;
 
+// ----------------------------------------------------
+
   void setChannelName(std::string channel_name);
+
   void setMode(int index, int mode);
+
   void setTopic(std::string topic);
+  void setKey(std::string key);
+
   void setOperator(std::vector<int> op);
   void setBanList(std::vector<int> ban_list);
-  void setKey(std::string key);
   void setInviteList(std::vector<int> invite_list);
 
+
+// ----------------------------------------------------
   void addUser(int user_fd, std::string user_nick);
 
   template <typename T, typename V>
@@ -59,12 +73,11 @@ class Channel {
     }
   }
 
+// ----------------------------------------------------
   void addOperator(int user);
   void removeOperator(int user);
-
-  std::string getModes(void);
-
   bool isOperator(int fd);
+
 };
 
 #endif

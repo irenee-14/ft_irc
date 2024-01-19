@@ -46,13 +46,17 @@ class Server {
   Server(char** argv);
   ~Server(void);
 
+  // -------------------------------------------------------------
+
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
+
+  // -------------------------------------------------------------
 
   void acceptLoop();
   void checkCommand(struct pollfd fds, char* buf);
 
-  // ------------------------ cmd ------------------------ //
+  // ---------------------------- cmd ----------------------------
 
   void pass(int fd, std::string token);
   void nick(int fd, std::string token);
@@ -63,7 +67,7 @@ class Server {
   void whois(int fd, std::string token);
   void quit(int fd);
 
-  // ------------------- cmdInChannel -------------------- //
+  // ----------------------- cmdInChannel -------------------------
 
   void join(int fd, std::string token);
   std::string userList(Channel& channel);
