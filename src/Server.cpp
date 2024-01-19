@@ -111,7 +111,8 @@ void Server::acceptLoop() {
         // 클라이언트 새로 생성 후 fd 할당
         clients[clnt_sock] = Client(clnt_sock);
 
-        std::cout << "connected client: " << clnt_sock << std::endl;
+        std::cout << "connected client: " << clnt_sock << std::endl
+                  << std::endl;
       }
       continue;
     }
@@ -148,7 +149,9 @@ void Server::acceptLoop() {
             fds.erase(fds.begin() + i);
             std::cout << "closed client: " << fds[i].fd << std::endl;
           }
-          write(1, "\n--check--\n\n", 12);
+          std::string check =
+              "\n-----------------------------------------------\n\n";
+          write(1, check.c_str(), std::strlen(check.c_str()));
         }
       }
     }
