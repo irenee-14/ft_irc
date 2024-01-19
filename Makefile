@@ -11,9 +11,10 @@ SRCS_FILES		=	main.cpp \
 					Channel.cpp \
 					Client.cpp \
 					Server.cpp \
-					checkCommand.cpp \
-					commands.cpp \
-					utils.cpp
+					checkCmd.cpp \
+					cmd.cpp \
+					cmdInChannel.cpp \
+					Utils.cpp
 SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 
 OBJS			=	$(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)

@@ -50,7 +50,11 @@ Server::~Server(void) { close(this->serv_fd); }
 
 Server& Server::operator=(Server const& rhs) {
   if (this != &rhs) {
-    *this = rhs;
+    this->serv_fd = rhs.serv_fd;
+    this->serv_adr = rhs.serv_adr;
+    this->fds = rhs.fds;
+    this->clients = rhs.clients;
+    this->channels = rhs.channels;
   }
   return (*this);
 }
