@@ -13,14 +13,31 @@
 #include "Client.hpp"
 #include "Utils.hpp"
 
-
-enum command_enum{ NICK = 0, USER, USERHOST, PING, LIST, WHOIS, JOIN, PART, PRIVMSG, NOTICE, KICK, INVITE, TOPIC, MODE, QUIT};
+enum command_enum {
+  NICK = 0,
+  USER,
+  USERHOST,
+  PING,
+  LIST,
+  WHOIS,
+  JOIN,
+  PART,
+  PRIVMSG,
+  NOTICE,
+  KICK,
+  INVITE,
+  TOPIC,
+  MODE,
+  QUIT
+};
 class Server {
  private:
   int serv_fd;
   struct sockaddr_in serv_adr;
   std::vector<struct pollfd> fds;
+
   std::string password;
+  std::map<std::string, int> command_list;
 
   std::map<int, Client> clients;
   std::vector<Channel> channels;
@@ -34,8 +51,8 @@ class Server {
   ~Server(void);
 
   // -------------------------------------------------------------
-  static std::map<std::string, int> command_list;
-  static void initializeCommandList();
+
+  void initializeCommandList();
 
   // ---------------------------------------------------------------
 
@@ -45,6 +62,7 @@ class Server {
   // -------------------------------------------------------------
 
   void acceptLoop();
+  void executeCommand(int fd, std::vector<std::string> toekns);
   void checkCommand(struct pollfd fds, char* buf);
 
   // ---------------------------- cmd ----------------------------

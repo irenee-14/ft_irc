@@ -41,6 +41,7 @@ Server::Server(char** argv) {
   fds.push_back(pollfd());
   fds[0].fd = this->serv_fd;
   fds[0].events = POLLIN;
+  initializeCommandList();
 }
 
 Server::Server(const Server& src) { *this = src; }
@@ -60,7 +61,6 @@ Server& Server::operator=(Server const& rhs) {
 
 // ---------------------------------------------------------------
 
-std::map<std::string, int> Server::command_list;
 void Server::initializeCommandList() {
   if (command_list.empty()) {
     command_list["NICK"] = 0;

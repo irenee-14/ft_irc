@@ -130,6 +130,9 @@ void Server::quit(int fd) {
 
     if (it != users.end()) {
       // 속해있는 채널에서 나가기
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // 유저가 한명일 때, 채널 두 개 들어갔다가 나가면 세그폴트
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       channels[i].removeUser(fd, users);
 
       // operator인 경우 operator 목록에서 제거
