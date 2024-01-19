@@ -1,5 +1,6 @@
 #include "Server.hpp"
 
+// join 시 채널에 있는 user들의 nick을 string으로 반환
 std::string Server::userList(Channel& channel) {
   std::string se = "";
 
@@ -76,17 +77,17 @@ void Server::part(int fd, std::string token) {
 
 // ----------------------------------------------------------------------------
 
-void Server::msg(int fd, std::vector<std::string> token, std::string cmd) {
+void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   // PRIVMSG target :babo
   // target이 채널이 아니면 target에게 메시지 보내기
-  if (token[1][0] != '#') {
+  if (tokens[1][0] != '#') {
     std::string se2 = ":" + clients[fd].getNick() + "!" +
                       clients[fd].getUserFd() + "@" +
-                      clients[fd].getServerName() + " " + cmd + " " + token[1] +
-                      " :" + token[2] + "\r\n";
+                      clients[fd].getServerName() + " " + cmd + " " + tokens[1] +
+                      " :" + tokens[2] + "\r\n";
     // users에서 user 찾기
     for (unsigned int i = 0; i < clients.size(); i++) {
-      if (clients[i].getNick() == token[1]) {
+      if (clients[i].getNick() == tokens[1]) {
         sendString(se2, i);
         return;
       }
@@ -94,17 +95,17 @@ void Server::msg(int fd, std::vector<std::string> token, std::string cmd) {
     // 보내려는 유저가 없으면 에러
     // :irc.local 401 root hi :No such nick
     std::string se = ":127.0.0.1 401 " + clients[fd].getNick() + " " +
-                     token[1] + " :No such nick\r\n";
+                     tokens[1] + " :No such nick\r\n";
     sendString(se, fd);
     return;
   }
 
   // PRIVMSG #channelname :hello
   // 채널에 속해있는 모든 유저에게 메시지 보내기
-  std::string name = token[1].substr(1, token[1].size() - 1);
+  std::string name = tokens[1].substr(1, tokens[1].size() - 1);
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    "@" + clients[fd].getServerName() + " " + cmd + " " +
-                   token[1] + " :" + token[2] + "\r\n";
+                   tokens[1] + " :" + tokens[2] + "\r\n";
   // 채널 이름으로 채널 찾기
   unsigned int i = 0;
   for (; i < channels.size(); i++) {
@@ -117,16 +118,16 @@ void Server::msg(int fd, std::vector<std::string> token, std::string cmd) {
   sendString(se, users);
 }
 
-void Server::privateMsg(int fd, std::vector<std::string> token) {
-  msg(fd, token, "PRIVMSG");
+void Server::privateMsg(int fd, std::vector<std::string> tokens) {
+  msg(fd, tokens, "PRIVMSG");
 }
 
-void Server::notice(int fd, std::vector<std::string> token) {
-  msg(fd, token, "NOTICE");
+void Server::notice(int fd, std::vector<std::string> tokens) {
+  msg(fd, tokens, "NOTICE");
 }
 
-void Server::kick(int fd, std::vector<std::string> token) {
-  std::string name = token[1].substr(1, token[1].size() - 1);
+void Server::kick(int fd, std::vector<std::string> tokens) {
+  std::string name = tokens[1].substr(1, tokens[1].size() - 1);
 
   // 채널 이름으로 채널 찾기
   unsigned int i = 0;
@@ -141,22 +142,22 @@ void Server::kick(int fd, std::vector<std::string> token) {
   // operator인지 확인
   if (channels[i].isOperator(fd)) {
     for (unsigned int j = 0; j < channels[i].getUserFds().size(); j++) {
-      if (channels[i].getUserNicks()[j] == token[2]) {
+      if (channels[i].getUserNicks()[j] == tokens[2]) {
         se += ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
-              "@" + clients[fd].getServerName() + " KICK " + token[1] + " " +
-              token[2] + " :" + token[3] + "\r\n";
+              "@" + clients[fd].getServerName() + " KICK " + tokens[1] + " " +
+              tokens[2] + " :" + tokens[3] + "\r\n";
         sendString(se, channels[i].getUserFds());
-        channels[i].removeUser(token[2], channels[i].getUserNicks());
+        channels[i].removeUser(tokens[2], channels[i].getUserNicks());
         return;
       }
     }
     // 보내려는 유저가 없으면 에러
     se += ":" + clients[fd].getServerName() + " 401 " + clients[fd].getNick() +
-          " " + token[2] + " :No such nick\r\n";
+          " " + tokens[2] + " :No such nick\r\n";
 
   } else {
     se += ":" + clients[fd].getServerName() + " 482 " + clients[fd].getNick() +
-          " " + token[1] + " :You must be a channel operator\r\n";
+          " " + tokens[1] + " :You must be a channel operator\r\n";
   }
   sendString(se, fd);
 }

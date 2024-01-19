@@ -72,10 +72,13 @@ class Server {
   void join(int fd, std::string token);
   std::string userList(Channel& channel);
   void part(int fd, std::string token);
-  void msg(int fd, std::vector<std::string> token, std::string cmd);
-  void notice(int fd, std::vector<std::string> token);
-  void privateMsg(int fd, std::vector<std::string> token);
-  void kick(int fd, std::vector<std::string> token);
+
+  void msg(int fd, std::vector<std::string> tokens, std::string cmd);
+  void notice(int fd, std::vector<std::string> tokens);
+  void privateMsg(int fd, std::vector<std::string> tokens);
+
+  void kick(int fd, std::vector<std::string> tokens);
+  void topic(int fd, std::vector<std::string> tokens);
 };
 
 #endif

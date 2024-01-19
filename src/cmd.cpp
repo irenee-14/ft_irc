@@ -65,16 +65,16 @@ void Server::pong(int fd) {
 // 채널 옵션 받아와서 출력 할 것
 // 채널 토픽 받아와서 출력 할 것
 
-void Server::list(int fd, std::string rawToken) {
+void Server::list(int fd, std::string token) {
   std::string se = ":" + clients[fd].getServerName() + " 321 " +
                    clients[fd].getNick() + " Channel :Users Name\r\n";
   // LIST #channel
   // # 제거하고 채널 이름과 비교해서 채널 정보 출력
-  if (rawToken.size() > 0) {
-    std::string token = rawToken.substr(1, rawToken.size() - 1);
+  if (token.size() > 0) {
+    std::string name = token.substr(1, token.size() - 1);
 
     for (unsigned int i = 0; i < channels.size(); ++i) {
-      if (channels[i].getChannelName() == token) {
+      if (channels[i].getChannelName() == name) {
         se += ":" + clients[fd].getServerName() + " 322 " +
               clients[fd].getNick() + " #" + channels[i].getChannelName() +
               " " + std::to_string(channels[i].getUserFds().size()) + " :[+" +
