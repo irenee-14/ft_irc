@@ -33,7 +33,7 @@ class Client {
 
   int getFd(void) const;
   std::string getNick(void) const;
-  std::string getUser(void) const;
+  std::string getUserFd(void) const;
   std::string getRealName(void) const;
   std::string getServerName(void) const;
   u_int32_t getTimestamp(void) const;

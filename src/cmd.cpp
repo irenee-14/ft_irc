@@ -11,7 +11,7 @@ void Server::pass(int fd, std::string token) {
 }
 
 void Server::nick(int fd, std::string token) {
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    "@" + clients[fd].getServerName() + " NICK :" + token +
                    "\r\n";
 
@@ -28,7 +28,7 @@ void Server::user(int fd, std::vector<std::string> tokens) {
   clients[fd].setRealName(tokens[4]);
 
   std::cout << "결과 : " << clients[fd].getNick() << " "
-            << clients[fd].getUser() << " " << clients[fd].getServerName()
+            << clients[fd].getUserFd() << " " << clients[fd].getServerName()
             << " " << clients[fd].getRealName() << std::endl;
 
   // 다 받은거 확인되면 welcome
@@ -45,7 +45,7 @@ void Server::userhost(int fd, std::vector<std::string> tokens) {
   std::string se = ":" + clients[fd].getServerName() + " 302 " +
                    clients[fd].getNick() + " :";
   for (unsigned int i = 1; i < tokens.size(); ++i) {
-    se += clients[fd].getNick() + "=+" + clients[fd].getUser() + "@" +
+    se += clients[fd].getNick() + "=+" + clients[fd].getUserFd() + "@" +
           clients[fd].getServerName() + " ";
   }
   se += "\r\n";
@@ -77,7 +77,7 @@ void Server::list(int fd, std::string rawToken) {
       if (channels[i].getChannelName() == token) {
         se += ":" + clients[fd].getServerName() + " 322 " +
               clients[fd].getNick() + " #" + channels[i].getChannelName() +
-              " " + std::to_string(channels[i].getUsers().size()) + " :[+" +
+              " " + std::to_string(channels[i].getUserFds().size()) + " :[+" +
               channels[i].getModes() + "]\r\n";
       }
     }
@@ -88,7 +88,7 @@ void Server::list(int fd, std::string rawToken) {
     for (unsigned int i = 0; i < channels.size(); ++i) {
       se += ":" + clients[fd].getServerName() + " 322 " +
             clients[fd].getNick() + " #" + channels[i].getChannelName() + " " +
-            std::to_string(channels[i].getUsers().size()) + " :[+" +
+            std::to_string(channels[i].getUserFds().size()) + " :[+" +
             channels[i].getModes() + "]\r\n";
     }
   }
@@ -101,7 +101,7 @@ void Server::list(int fd, std::string rawToken) {
 void Server::whois(int fd, std::string token) {
   std::string se = ":" + clients[fd].getServerName() + " 311 " +
                    clients[fd].getNick() + " " + token + " " +
-                   clients[fd].getUser() + " " + clients[fd].getServerName() +
+                   clients[fd].getUserFd() + " " + clients[fd].getServerName() +
                    " * :" + clients[fd].getRealName() + "\r\n";
   se += ":" + clients[fd].getServerName() + " 312 " + clients[fd].getNick() +
         " " + token + " " + clients[fd].getServerName() +
@@ -124,12 +124,13 @@ void Server::whois(int fd, std::string token) {
 void Server::quit(int fd) {
   // 채널에서 나가기
   for (unsigned int i = 0; i < channels.size(); ++i) {
-    std::vector<int> users = channels[i].getUsers();
+    std::vector<int> users = channels[i].getUserFds();
+
     std::vector<int>::iterator it = std::find(users.begin(), users.end(), fd);
 
     if (it != users.end()) {
       // 속해있는 채널에서 나가기
-      channels[i].removeUser(fd);
+      channels[i].removeUser(fd, users);
 
       // operator인 경우 operator 목록에서 제거
       std::vector<int> ops = channels[i].getOperators();
@@ -140,13 +141,13 @@ void Server::quit(int fd) {
 
       // 채널에 속한 모든 user에게 quit 메시지 보내기
       std::string se = ":" + clients[fd].getNick() + "!" +
-                       clients[fd].getUser() + "@" +
+                       clients[fd].getUserFd() + "@" +
                        clients[fd].getServerName() + " QUIT :leaving\r\n";
-      sendString(se, channels[i].getUsers());
+      sendString(se, channels[i].getUserFds());
     }
   }
   // server에 quit 메시지 보내기
-  std::string se = "ERROR :Closing link: (" + clients[fd].getUser() + "@" +
+  std::string se = "ERROR :Closing link: (" + clients[fd].getUserFd() + "@" +
                    clients[fd].getServerName() + ") [Quit: leaving]\r\n";
 
   sendString(se, fd);

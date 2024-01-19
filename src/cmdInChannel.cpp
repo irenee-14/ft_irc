@@ -3,7 +3,7 @@
 std::string Server::userList(Channel& channel) {
   std::string se = "";
 
-  std::vector<int> users = channel.getUsers();
+  std::vector<int> users = channel.getUserFds();
   std::vector<int> ops = channel.getOperators();
   std::cout << "\nusers : " << users.size() << " ops : " << ops.size() << "\n"
             << std::endl;
@@ -24,7 +24,7 @@ void Server::join(int fd, std::string token) {
 
   for (; i < channels.size(); i++) {
     if (channels[i].getChannelName() == name) {
-      channels[i].addUser(fd);
+      channels[i].addUser(fd, clients[fd].getNick());
       break;
     }
   }
@@ -32,15 +32,15 @@ void Server::join(int fd, std::string token) {
   // 채널 없으면 새로 만들기
   if (i == channels.size()) {
     channels.push_back(Channel(name));
-    channels[i].addUser(fd);
+    channels[i].addUser(fd, clients[fd].getNick());
     channels[i].addOperator(fd);
   }
 
   // 채널에 속한 모든 user에게 join 메시지 보내기
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    "@" + clients[fd].getServerName() + " JOIN :#" + name +
                    "\r\n";
-  sendString(se, channels[i].getUsers());
+  sendString(se, channels[i].getUserFds());
 
   // 채널에 들어온 user에게 채널 정보 보내기
   std::string se2 = ":127.0.0.1 353 " + clients[fd].getNick() + " = #" + name +
@@ -62,14 +62,14 @@ void Server::part(int fd, std::string token) {
       break;
     }
   }
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    " PART :#" + name + "\r\n";
 
-  sendString(se, channels[i].getUsers());
+  sendString(se, channels[i].getUserFds());
   // users에서 지우기
-  channels[i].removeUser(fd);
+  channels[i].removeUser(fd, channels[i].getUserFds());
   // users에서 빠지면서 채널에 아무도 없으면 채널 없애기
-  if (channels[i].getUsers().empty()) {
+  if (channels[i].getUserFds().empty()) {
     channels.erase(channels.begin() + i);
   }
 }
@@ -81,7 +81,7 @@ void Server::msg(int fd, std::vector<std::string> token, std::string cmd) {
   // target이 채널이 아니면 target에게 메시지 보내기
   if (token[1][0] != '#') {
     std::string se2 = ":" + clients[fd].getNick() + "!" +
-                      clients[fd].getUser() + "@" +
+                      clients[fd].getUserFd() + "@" +
                       clients[fd].getServerName() + " " + cmd + " " + token[1] +
                       " :" + token[2] + "\r\n";
     // users에서 user 찾기
@@ -102,7 +102,7 @@ void Server::msg(int fd, std::vector<std::string> token, std::string cmd) {
   // PRIVMSG #channelname :hello
   // 채널에 속해있는 모든 유저에게 메시지 보내기
   std::string name = token[1].substr(1, token[1].size() - 1);
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    "@" + clients[fd].getServerName() + " " + cmd + " " +
                    token[1] + " :" + token[2] + "\r\n";
   // 채널 이름으로 채널 찾기
@@ -112,7 +112,7 @@ void Server::msg(int fd, std::vector<std::string> token, std::string cmd) {
       break;
     }
   }
-  std::vector<int> users = channels[i].getUsers();
+  std::vector<int> users = channels[i].getUserFds();
   users.erase(std::remove(users.begin(), users.end(), fd), users.end());
   sendString(se, users);
 }
@@ -125,14 +125,9 @@ void Server::notice(int fd, std::vector<std::string> token) {
   msg(fd, token, "NOTICE");
 }
 
-// KICK #hi root :bye
-// :root!root@127.0.0.1 KICK #hi root :bye
-
 void Server::kick(int fd, std::vector<std::string> token) {
   std::string name = token[1].substr(1, token[1].size() - 1);
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
-                   "@" + clients[fd].getServerName() + " KICK " + token[1] +
-                   " " + token[2] + " :" + token[3] + "\r\n";
+
   // 채널 이름으로 채널 찾기
   unsigned int i = 0;
   for (; i < channels.size(); i++) {
@@ -141,5 +136,27 @@ void Server::kick(int fd, std::vector<std::string> token) {
     }
   }
 
-  sendString(se, channels[i].getUsers());
+  std::string se = "";
+
+  // operator인지 확인
+  if (channels[i].isOperator(fd)) {
+    for (unsigned int j = 0; j < channels[i].getUserFds().size(); j++) {
+      if (channels[i].getUserNicks()[j] == token[2]) {
+        se += ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
+              "@" + clients[fd].getServerName() + " KICK " + token[1] + " " +
+              token[2] + " :" + token[3] + "\r\n";
+        sendString(se, channels[i].getUserFds());
+        channels[i].removeUser(token[2], channels[i].getUserNicks());
+        return;
+      }
+    }
+    // 보내려는 유저가 없으면 에러
+    se += ":" + clients[fd].getServerName() + " 401 " + clients[fd].getNick() +
+          " " + token[2] + " :No such nick\r\n";
+
+  } else {
+    se += ":" + clients[fd].getServerName() + " 482 " + clients[fd].getNick() +
+          " " + token[1] + " :You must be a channel operator\r\n";
+  }
+  sendString(se, fd);
 }
