@@ -80,9 +80,9 @@ class Channel {
   void removeOperator(int user);
 
   // ----------------------------------------------------
-  unsigned int isUser(int fd);
-  unsigned int isUser(std::string user_nick);
-  unsigned int isOperator(int fd);
+  int isUser(int fd);
+  int isUser(std::string user_nick);
+  int isOperator(int fd);
 };
 
 #endif

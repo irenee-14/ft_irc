@@ -159,20 +159,21 @@ void Server::acceptLoop() {
 }
 
 // ----------------------------------------------------------------------
-unsigned int Server::isChannel(std::string channel_name) {
+int Server::isChannel(std::string channel_name) {
   for (unsigned int i = 0; i < channels.size(); i++) {
     if (channels[i].getChannelName() == channel_name) {
+      std::cout << "i : " << i << std::endl;
       return (i);
     }
   }
-  return (false);
+  return (-1);
 }
 
-unsigned int Server::isUser(std::string user_nick) {
+int Server::isUser(std::string user_nick) {
   for (unsigned int i = 0; i < clients.size(); i++) {
     if (clients[i].getNick() == user_nick) {
       return (i);
     }
   }
-  return (false);
+  return (-1);
 }

@@ -22,11 +22,11 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   std::string user = tokens[1];
 
   // channel 인덱스
-  unsigned int i = isChannel(name);
+  int i = isChannel(name);
 
   // invite한 channel이 존재하는지 확인
 
-  if (i == channels.size()) {
+  if (i <= 0) {
     std::string se = ":" + clients[fd].getServerName() + " 403 " +
                      clients[fd].getNick() + " " + tokens[2] +
                      " :No such channel\r\n";
@@ -37,7 +37,7 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   // invite 받은 user가 서버에 존재하는지 확인
   // std::map<int, Client>::iterator it = clients.begin();
   int target_fd = isUser(user);
-  if (target_fd) {
+  if (target_fd >= 0) {
     std::string se = ":" + clients[fd].getServerName() + " 401 " +
                      clients[fd].getNick() + " " + user + " :No such nick\r\n";
     sendString(se, fd);
@@ -47,7 +47,7 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   // invite한 user가 채널에 속해있는지 확인
   // std::vector<int> users = channels[i].getUserFds();
   // std::vector<int>::iterator it2 = std::find(users.begin(), users.end(), fd);
-  if (channels[i].isUser(fd)) {
+  if (channels[i].isUser(fd) >= 0) {
     std::string se = ":" + clients[fd].getServerName() + " 442 " +
                      clients[fd].getNick() + " " + tokens[2] +
                      " :You're not on that channel!\r\n";
@@ -59,7 +59,7 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   // std::vector<int> ops = channels[i].getOperators();
   // std::vector<int>::iterator it3 = std::find(ops.begin(), ops.end(), fd);
 
-  if (channels[i].isOperator(fd)) {
+  if (channels[i].isOperator(fd) >= 0) {
     std::string se = ":" + clients[fd].getServerName() + " 482 " +
                      clients[fd].getNick() + " " + tokens[2] +
                      " :You must be a channel operator\r\n";
@@ -70,7 +70,7 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   // invite 받은 user가 채널에 속해있는지 확인
   // std::vector<int>::iterator it4 =
   //     std::find(users.begin(), users.end(), it->first);
-  if (!channels[i].isUser(user)) {
+  if (channels[i].isUser(user) >= 0) {
     std::string se = ":" + clients[fd].getServerName() + " 443 " +
                      clients[fd].getNick() + " " + user + " " + tokens[2] +
                      " :is already on channel\r\n";

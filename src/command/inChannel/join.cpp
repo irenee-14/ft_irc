@@ -32,16 +32,15 @@ void Server::join(int fd, std::string token) {
   //   }
   // }
 
-  unsigned int channel_idx = isChannel(name);
-  if (channel_idx) {
+  int channel_idx = isChannel(name);
+  if (channel_idx >= 0) {
     channels[channel_idx].addUser(fd, clients[fd].getNick());
   }
-
   // 채널 없으면 새로 만들기
-  if (channel_idx == channels.size()) {
+  else {
     channels.push_back(Channel(name));
-    channels[i].addUser(fd, clients[fd].getNick());
-    channels[i].addOperator(fd);
+    channels.back().addUser(fd, clients[fd].getNick());
+    channels.back().addOperator(fd);
   }
 
   // 채널에 속한 모든 user에게 join 메시지 보내기

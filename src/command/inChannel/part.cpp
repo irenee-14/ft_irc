@@ -12,9 +12,9 @@ void Server::part(int fd, std::string token) {
   //     break;
   //   }
   // }
-  unsigned int channel_idx = isChannel(name);
+  int channel_idx = isChannel(name);
 
-  if (token[0] != '#' || channel_idx == channels.size()) {
+  if (token[0] != '#' || channel_idx < 0) {
     std::string se = ":127.0.0.1 403 " + clients[fd].getNick() + " " + token +
                      " :No such channel\r\n";
     sendString(se, fd);

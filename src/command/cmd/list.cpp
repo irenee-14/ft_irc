@@ -8,16 +8,16 @@ void Server::list(int fd, std::vector<std::string> tokens) {
   if (channels.size() > 0) {
     // LIST #channel
     // # 제거하고 채널 이름과 비교해서 채널 정보 출력
-    if (tokens.size() > 1) {
+    if (tokens[1] != "") {
       std::string name = tokens[1].substr(1, tokens[1].size() - 1);
-
-      for (unsigned int i = 0; i < channels.size(); ++i) {
-        if (channels[i].getChannelName() == name) {
-          se += ":" + clients[fd].getServerName() + " 322 " +
-                clients[fd].getNick() + " #" + channels[i].getChannelName() +
-                " " + std::to_string(channels[i].getUserFds().size()) + " :[+" +
-                channels[i].getModes() + "]\r\n";
-        }
+      // for (unsigned int i = 0; i < channels.size(); ++i) {
+      //   if (channels[i].getChannelName() == name) {
+      int channel_idx = isChannel(name);
+      if (channel_idx >= 0) {
+        se += ":" + clients[fd].getServerName() + " 322 " +
+              clients[fd].getNick() + " #" + name + " " +
+              std::to_string(channels[channel_idx].getUserFds().size()) +
+              " :[+" + channels[channel_idx].getModes() + "]\r\n";
       }
     }
     // LIST
@@ -35,3 +35,5 @@ void Server::list(int fd, std::vector<std::string> tokens) {
         " :End of channel list.\r\n";
   sendString(se, fd);
 }
+
+// 헷갈리는 부분 : list 여러개 확인 못 했었나?

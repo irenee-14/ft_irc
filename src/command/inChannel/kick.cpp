@@ -14,30 +14,35 @@ void Server::kick(int fd, std::vector<std::string> tokens) {
 
   int channel_idx = isChannel(name);
 
-  std::string se = "";
+  if (channel_idx >= 0) {
+    std::string se = "";
 
-  // operator인지 확인
-  if (channels[channel_idx].isOperator(fd)) {
-    // for (unsigned int j = 0; j < user_fds.size(); j++) {
-    //   if (channels[channel_idx].getUserNicks()[j] == tokens[2]) {
-    if (channels[channel_idx].isUser(target)) {
-      se += ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() + "@" +
-            clients[fd].getServerName() + " KICK " + tokens[1] + " " + target +
-            " :" + tokens[3] + "\r\n";
+    // operator인지 확인
+    if (channels[channel_idx].isOperator(fd) >= 0) {
+      // for (unsigned int j = 0; j < user_fds.size(); j++) {
+      //   if (channels[channel_idx].getUserNicks()[j] == tokens[2]) {
+      if (channels[channel_idx].isUser(target) >= 0) {
+        se += ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
+              "@" + clients[fd].getServerName() + " KICK " + tokens[1] + " " +
+              target + " :" + tokens[3] + "\r\n";
 
-      sendString(se, channels[channel_idx].getUserFds());
+        sendString(se, channels[channel_idx].getUserFds());
 
-      channels[channel_idx].removeUser(target);
+        channels[channel_idx].removeUser(target);
 
-      return;
+        return;
+      }
+
+      // 보내려는 유저가 없으면 에러
+      se += ":" + clients[fd].getServerName() + " 401 " +
+            clients[fd].getNick() + " " + target + " :No such nick\r\n";
+    } else {
+      se += ":" + clients[fd].getServerName() + " 482 " +
+            clients[fd].getNick() + " " + tokens[1] +
+            " :You must be a channel operator\r\n";
     }
-
-    // 보내려는 유저가 없으면 에러
-    se += ":" + clients[fd].getServerName() + " 401 " + clients[fd].getNick() +
-          " " + target + " :No such nick\r\n";
-  } else {
-    se += ":" + clients[fd].getServerName() + " 482 " + clients[fd].getNick() +
-          " " + tokens[1] + " :You must be a channel operator\r\n";
+    sendString(se, fd);
   }
-  sendString(se, fd);
+  // !!!!! else
+  // 채널이 없는 경우
 }

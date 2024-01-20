@@ -14,26 +14,29 @@ void Server::topic(int fd, std::vector<std::string> tokens) {
   //   }
   // }
 
-  unsigned int channel_idx = isChannel(name);
-  std::string se = "";
+  int channel_idx = isChannel(name);
+  if (channel_idx >= 0) {
+    std::string se = "";
 
-  // operator인지 확인
-  if (channels[channel_idx].isOperator(fd)) {
-    channels[channel_idx].setTopic(tokens[2]);
+    // operator인지 확인
+    if (channels[channel_idx].isOperator(fd) >= 0) {
+      channels[channel_idx].setTopic(tokens[2]);
 
-    se += ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() + "@" +
-          clients[fd].getServerName() + " TOPIC " + tokens[1] + " :" +
-          tokens[2] + "\r\n";
+      se += ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() + "@" +
+            clients[fd].getServerName() + " TOPIC " + tokens[1] + " :" +
+            tokens[2] + "\r\n";
 
-    sendString(se, channels[channel_idx].getUserFds());
+      sendString(se, channels[channel_idx].getUserFds());
 
-    return;
-  } else {
-    se += ":" + clients[fd].getServerName() + " 482 " + clients[fd].getNick() +
-          " " + tokens[1] +
-          " :You do not have access to change the topic on this channel\r\n";
+      return;
+    } else {
+      se += ":" + clients[fd].getServerName() + " 482 " +
+            clients[fd].getNick() + " " + tokens[1] +
+            " :You do not have access to change the topic on this channel\r\n";
+    }
+    sendString(se, fd);
   }
-  sendString(se, fd);
-
+  // !!!else
+  // 채널이 없는 경우
   // mode +t 일때 운영자만 가능 추가하기
 }

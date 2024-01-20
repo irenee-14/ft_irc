@@ -17,7 +17,7 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
     //     return;
     //   }
     // }
-    if (isUser(target)) sendString(se2, i);
+    if (isUser(target) >= 0) sendString(se2, i);
     // 보내려는 유저가 없으면 에러
     // :irc.local 401 root hi :No such nick
     else {
@@ -43,11 +43,14 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   //     break;
   //   }
   // }
-  unsigned int channel_idx = isChannel(name);
-
-  std::vector<int> users = channels[channel_idx].getUserFds();
-  users.erase(std::remove(users.begin(), users.end(), fd), users.end());
-  sendString(se, users);
+  int channel_idx = isChannel(name);
+  if (channel_idx >= 0) {
+    std::vector<int> users = channels[channel_idx].getUserFds();
+    users.erase(std::remove(users.begin(), users.end(), fd), users.end());
+    sendString(se, users);
+  }
+  // !!!!!!else
+  // 채널이 없는 경우
 }
 
 void Server::privateMsg(int fd, std::vector<std::string> tokens) {
