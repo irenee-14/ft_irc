@@ -92,6 +92,10 @@ class Server {
   void topic(int fd, std::vector<std::string> tokens);
 
   void invite(int fd, std::vector<std::string> tokens);
+
+  // --------------------------------------------------------------
+  unsigned int isChannel(std::string channel_name);
+  unsigned int isUser(std::string user_nick);
 };
 
 #endif

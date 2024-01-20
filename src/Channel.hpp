@@ -60,7 +60,8 @@ class Channel {
 
   // ----------------------------------------------------
   void addUser(int user_fd, std::string user_nick);
-
+  void removeUser(int find);
+  void removeUser(std::string find);
   // fd로 찾는 경우 T : 찾을 fd, V : getUserFds
   // nick으로 찾는 경우 T ; 찾을 nickname, V : getUserNicks
   //  template <typename T, typename V>
@@ -74,13 +75,14 @@ class Channel {
   //    }
   //  }
 
-  void removeUser(int find);
-  void removeUser(std::string find);
-
   // ----------------------------------------------------
   void addOperator(int user);
   void removeOperator(int user);
-  bool isOperator(int fd);
+
+  // ----------------------------------------------------
+  unsigned int isUser(int fd);
+  unsigned int isUser(std::string user_nick);
+  unsigned int isOperator(int fd);
 };
 
 #endif

@@ -145,9 +145,23 @@ std::string Channel::getModes(void) {
 // 인자로 어느 채널인지 받아서 그 채널의 operator인지 확인
 // operator이면 true, 아니면 false
 
-bool Channel::isOperator(int fd) {
-  std::vector<int>::iterator it =
-      std::find(this->_operator.begin(), this->_operator.end(), fd);
-  if (it != this->_operator.end()) return (true);
+unsigned int Channel::isOperator(int fd) {
+  for (unsigned int i = 0; i < this->_operator.size(); i++) {
+    if (this->_operator[i] == fd) return (i);
+  }
+  return (false);
+}
+
+unsigned int Channel::isUser(int fd) {
+  for (unsigned int i = 0; i < this->_user_fds.size(); i++) {
+    if (this->_user_fds[i] == fd) return (i);
+  }
+  return (false);
+}
+
+unsigned int Channel::isUser(std::string user_nick) {
+  for (unsigned int i = 0; i < this->_user_nicks.size(); i++) {
+    if (this->_user_nicks[i] == user_nick) return (i);
+  }
   return (false);
 }

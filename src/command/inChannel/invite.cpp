@@ -18,16 +18,11 @@
 // :irc.local 443 root root_ #hi :is already on channel
 
 void Server::invite(int fd, std::vector<std::string> tokens) {
-  unsigned int i = 0;
-
   std::string name = tokens[2].substr(1, tokens[2].size() - 1);
   std::string user = tokens[1];
 
-  for (; i < channels.size(); i++) {
-    if (channels[i].getChannelName() == name) {
-      break;
-    }
-  }
+  // channel 인덱스
+  unsigned int i = isChannel(name);
 
   // invite한 channel이 존재하는지 확인
 
@@ -40,15 +35,9 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   }
 
   // invite 받은 user가 서버에 존재하는지 확인
-  std::map<int, Client>::iterator it = clients.begin();
-
-  for (; it != clients.end(); ++it) {
-    if (it->second.getNick() == user) {
-      break;
-    }
-  }
-
-  if (it == clients.end()) {
+  // std::map<int, Client>::iterator it = clients.begin();
+  int target_fd = isUser(user);
+  if (target_fd) {
     std::string se = ":" + clients[fd].getServerName() + " 401 " +
                      clients[fd].getNick() + " " + user + " :No such nick\r\n";
     sendString(se, fd);
@@ -56,11 +45,9 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   }
 
   // invite한 user가 채널에 속해있는지 확인
-  std::vector<int> users = channels[i].getUserFds();
-
-  std::vector<int>::iterator it2 = std::find(users.begin(), users.end(), fd);
-
-  if (it2 == users.end()) {
+  // std::vector<int> users = channels[i].getUserFds();
+  // std::vector<int>::iterator it2 = std::find(users.begin(), users.end(), fd);
+  if (channels[i].isUser(fd)) {
     std::string se = ":" + clients[fd].getServerName() + " 442 " +
                      clients[fd].getNick() + " " + tokens[2] +
                      " :You're not on that channel!\r\n";
@@ -69,11 +56,10 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   }
 
   // invite한 user가 operator인지 확인
-  std::vector<int> ops = channels[i].getOperators();
+  // std::vector<int> ops = channels[i].getOperators();
+  // std::vector<int>::iterator it3 = std::find(ops.begin(), ops.end(), fd);
 
-  std::vector<int>::iterator it3 = std::find(ops.begin(), ops.end(), fd);
-
-  if (it3 == ops.end()) {
+  if (channels[i].isOperator(fd)) {
     std::string se = ":" + clients[fd].getServerName() + " 482 " +
                      clients[fd].getNick() + " " + tokens[2] +
                      " :You must be a channel operator\r\n";
@@ -82,10 +68,9 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   }
 
   // invite 받은 user가 채널에 속해있는지 확인
-  std::vector<int>::iterator it4 =
-      std::find(users.begin(), users.end(), it->first);
-
-  if (it4 != users.end()) {
+  // std::vector<int>::iterator it4 =
+  //     std::find(users.begin(), users.end(), it->first);
+  if (!channels[i].isUser(user)) {
     std::string se = ":" + clients[fd].getServerName() + " 443 " +
                      clients[fd].getNick() + " " + user + " " + tokens[2] +
                      " :is already on channel\r\n";
@@ -99,14 +84,12 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    "@" + clients[fd].getServerName() + " INVITE " + user +
                    " #" + name + "\r\n";
+  sendString(se, target_fd);
 
-  sendString(se, it->first);
-
-  // 보내는 user에게 보내는 메시지
+  // invite를 보내는 user에게 보내는 메시지
   std::string se2 = ":" + clients[fd].getServerName() + " 341 " +
                     clients[fd].getNick() + " " + user + " " + tokens[2] +
                     "\r\n";
-
   sendString(se2, fd);
 
   // 채널에 속한 모든 user에게 보내는 메시지
@@ -116,7 +99,7 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
       clients[fd].getServerName() + " NOTICE " + tokens[2] + " :*** " +
       clients[fd].getNick() + " invited " + user + " into the channel\r\n";
 
+  std::vector<int> users = channels[i].getUserFds();
   users.erase(std::remove(users.begin(), users.end(), fd), users.end());
-
   sendString(se3, users);
 }

@@ -11,27 +11,34 @@ std::string Server::userList(Channel& channel) {
 
   for (unsigned int i = 0; i < users.size(); ++i) {
     std::vector<int>::iterator it = std::find(ops.begin(), ops.end(), users[i]);
+
     if (it != ops.end()) se += "@";
     se += clients[users[i]].getNick();
+
     if (i != users.size() - 1) se += " ";
   }
   return (se);
 }
 
 void Server::join(int fd, std::string token) {
-  unsigned int i = 0;
+  // unsigned int i = 0;
 
   std::string name = token.substr(1, token.size() - 1);
 
-  for (; i < channels.size(); i++) {
-    if (channels[i].getChannelName() == name) {
-      channels[i].addUser(fd, clients[fd].getNick());
-      break;
-    }
+  // for (; i < channels.size(); i++) {
+  //   if (channels[i].getChannelName() == name) {
+  //     channels[i].addUser(fd, clients[fd].getNick());
+  //     break;
+  //   }
+  // }
+
+  unsigned int channel_idx = isChannel(name);
+  if (channel_idx) {
+    channels[channel_idx].addUser(fd, clients[fd].getNick());
   }
 
   // 채널 없으면 새로 만들기
-  if (i == channels.size()) {
+  if (channel_idx == channels.size()) {
     channels.push_back(Channel(name));
     channels[i].addUser(fd, clients[fd].getNick());
     channels[i].addOperator(fd);
