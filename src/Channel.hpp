@@ -61,16 +61,21 @@ class Channel {
   // ----------------------------------------------------
   void addUser(int user_fd, std::string user_nick);
 
-  template <typename T, typename V>
-  void removeUser(T find, V type) {
-    for (unsigned int i = 0; i < type.size(); i++) {
-      if (type[i] == find) {
-        this->_user_fds.erase(this->_user_fds.begin() + i);
-        this->_user_nicks.erase(this->_user_nicks.begin() + i);
-        break;
-      }
-    }
-  }
+  // fd로 찾는 경우 T : 찾을 fd, V : getUserFds
+  // nick으로 찾는 경우 T ; 찾을 nickname, V : getUserNicks
+  //  template <typename T, typename V>
+  //  void removeUser(T find, V type) {
+  //    for (unsigned int i = 0; i < type.size(); i++) {
+  //      if (type[i] == find) {
+  //        this->_user_fds.erase(this->_user_fds.begin() + i);
+  //        this->_user_nicks.erase(this->_user_nicks.begin() + i);
+  //        break;
+  //      }
+  //    }
+  //  }
+
+  void removeUser(int find);
+  void removeUser(std::string find);
 
   // ----------------------------------------------------
   void addOperator(int user);

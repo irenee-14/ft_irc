@@ -21,7 +21,7 @@ void Server::kick(int fd, std::vector<std::string> tokens) {
               "@" + clients[fd].getServerName() + " KICK " + tokens[1] + " " +
               tokens[2] + " :" + tokens[3] + "\r\n";
         sendString(se, channels[i].getUserFds());
-        channels[i].removeUser(tokens[2], channels[i].getUserNicks());
+        channels[i].removeUser(tokens[2]);
         return;
       }
     }
