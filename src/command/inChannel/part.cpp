@@ -11,7 +11,12 @@ void Server::part(int fd, std::string token) {
       break;
     }
   }
-  if (i != channels.size()) {
+  if (token[0] != '#' || i == channels.size()) {
+    std::string se = ":127.0.0.1 403 " + clients[fd].getNick() + " " + token +
+                     " :No such channel\r\n";
+    sendString(se, fd);
+    return;
+  } else {
     std::string se = ":" + clients[fd].getNick() + "!" +
                      clients[fd].getUserFd() + " PART :#" + name + "\r\n";
 

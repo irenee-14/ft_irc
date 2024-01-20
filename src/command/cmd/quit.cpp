@@ -20,9 +20,7 @@ void Server::quit(int fd) {
         channels[i].removeOperator(fd);
       }
 
-      std::cout << "aaaaaaaaaaaaaa\n " << std::endl;
       channels[i].removeUser(fd);
-      std::cout << "hererererereree\n" << std::endl;
 
       // 채널에 속한 모든 user에게 quit메시지 보내기
       if (channels[i].getUserFds().size() > 0) {

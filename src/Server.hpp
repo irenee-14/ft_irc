@@ -64,7 +64,7 @@ class Server {
   // -------------------------------------------------------------
 
   void acceptLoop();
-  void executeCommand(int fd, std::vector<std::string> toekns);
+  void executeCommand(int fd, std::vector<std::string> tokens);
   void checkCommand(struct pollfd fds, char* buf);
 
   // ---------------------------- cmd ----------------------------
@@ -90,6 +90,8 @@ class Server {
 
   void kick(int fd, std::vector<std::string> tokens);
   void topic(int fd, std::vector<std::string> tokens);
+
+  void invite(int fd, std::vector<std::string> tokens);
 };
 
 #endif

@@ -22,6 +22,7 @@ Channel& Channel::operator=(Channel const& rhs) {
   if (this != &rhs) {
     this->_channel_name = rhs._channel_name;
     this->_user_fds = rhs._user_fds;
+    this->_user_nicks = rhs._user_nicks;
     for (int i = 0; i < 5; i++) this->_mode[i] = rhs._mode[i];
     this->_topic = rhs._topic;
     this->_operator = rhs._operator;
@@ -91,7 +92,6 @@ void Channel::setInviteList(std::vector<int> invite_list) {
 void Channel::addUser(int user_fd, std::string user_nick) {
   this->_user_fds.push_back(user_fd);
   this->_user_nicks.push_back(user_nick);
-  std::cout << "add user : " << user_fd << user_nick << std::endl;
 }
 
 void Channel::removeUser(int find) {
