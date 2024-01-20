@@ -65,6 +65,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
       kick(fd, tokens);
       break;
     case INVITE:
+      invite(fd, tokens);
       break;
     case TOPIC:
       topic(fd, tokens);

@@ -45,11 +45,13 @@ CMD_FILES		=	list.cpp \
 CMD				=	$(addprefix $(CMD_DIR)/, $(CMD_FILES))
 
 CHANNEL_DIR		=	./src/command/inChannel
-CHANNEL_FILES	=	join.cpp \
+CHANNEL_FILES	=	invite.cpp \
+					join.cpp \
 					kick.cpp \
 					part.cpp \
 					privMsg.cpp \
-					topic.cpp
+					topic.cpp 
+					
 CHANNEL			=	$(addprefix $(CHANNEL_DIR)/, $(CHANNEL_FILES))
 
 # ---------------------------------------------------------------------

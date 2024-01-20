@@ -90,6 +90,8 @@ class Server {
 
   void kick(int fd, std::vector<std::string> tokens);
   void topic(int fd, std::vector<std::string> tokens);
+
+  void invite(int fd, std::vector<std::string> tokens);
 };
 
 #endif
