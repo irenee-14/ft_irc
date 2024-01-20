@@ -12,15 +12,15 @@ class Channel {
   std::string _channel_name;
   std::vector<int> _user_fds;
   std::vector<std::string> _user_nicks;
-
+  // -------------------------------------------------------------
   int _mode[5];
   std::string _topic;
   std::string _key;
-  
+  // -------------------------------------------------------------
   std::vector<int> _operator;
   std::vector<int> _ban_list;
   std::vector<int> _invite_list;
-
+  // -------------------------------------------------------------
   Channel(void);
 
  public:
@@ -29,14 +29,14 @@ class Channel {
   Channel& operator=(Channel const& rhs);
   ~Channel(void);
 
-// ----------------------------------------------------
+  // ----------------------------------------------------
 
   std::string getChannelName() const;
   std::vector<int> getUserFds() const;
   std::vector<std::string> getUserNicks() const;
 
   int getMode(int index) const;
-   std::string getModes(void);
+  std::string getModes(void);
 
   std::string getTopic() const;
   std::string getKey() const;
@@ -45,7 +45,7 @@ class Channel {
   std::vector<int> getBanList() const;
   std::vector<int> getInviteList() const;
 
-// ----------------------------------------------------
+  // ----------------------------------------------------
 
   void setChannelName(std::string channel_name);
 
@@ -58,26 +58,29 @@ class Channel {
   void setBanList(std::vector<int> ban_list);
   void setInviteList(std::vector<int> invite_list);
 
-
-// ----------------------------------------------------
+  // ----------------------------------------------------
   void addUser(int user_fd, std::string user_nick);
 
-  template <typename T, typename V>
-  void removeUser(T find, V type) {
-    for (unsigned int i = 0; i < type.size(); i++) {
-      if (type[i] == find) {
-        this->_user_fds.erase(this->_user_fds.begin() + i);
-        this->_user_nicks.erase(this->_user_nicks.begin() + i);
-        break;
-      }
-    }
-  }
+  // fd로 찾는 경우 T : 찾을 fd, V : getUserFds
+  // nick으로 찾는 경우 T ; 찾을 nickname, V : getUserNicks
+  //  template <typename T, typename V>
+  //  void removeUser(T find, V type) {
+  //    for (unsigned int i = 0; i < type.size(); i++) {
+  //      if (type[i] == find) {
+  //        this->_user_fds.erase(this->_user_fds.begin() + i);
+  //        this->_user_nicks.erase(this->_user_nicks.begin() + i);
+  //        break;
+  //      }
+  //    }
+  //  }
 
-// ----------------------------------------------------
+  void removeUser(int find);
+  void removeUser(std::string find);
+
+  // ----------------------------------------------------
   void addOperator(int user);
   void removeOperator(int user);
   bool isOperator(int fd);
-
 };
 
 #endif
