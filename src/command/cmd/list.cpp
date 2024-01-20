@@ -3,7 +3,7 @@
 void Server::list(int fd, std::vector<std::string> tokens) {
   std::string se = ":" + clients[fd].getServerName() + " 321 " +
                    clients[fd].getNick() + " Channel :Users Name\r\n";
-  std::cout << "channel size ; " << channels.size() << std::endl;
+  std::cout << "channel size : " << channels.size() << std::endl;
 
   if (channels.size() > 0) {
     // LIST #channel
@@ -23,9 +23,7 @@ void Server::list(int fd, std::vector<std::string> tokens) {
     // LIST
     // 모든 채널 정보 출력
     else {
-      std::cout << "list -yes" << std::endl;
       for (unsigned int i = 0; i < channels.size(); ++i) {
-        std::cout << "list i : " << i << std::endl;
         se += ":" + clients[fd].getServerName() + " 322 " +
               clients[fd].getNick() + " #" + channels[i].getChannelName() +
               " " + std::to_string(channels[i].getUserFds().size()) + " :[+" +
