@@ -44,7 +44,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
       pong(fd);
       break;
     case LIST:
-      list(fd, tokens[1]);
+      list(fd, tokens);
       break;
     case WHOIS:
       whois(fd, tokens[1]);
@@ -96,7 +96,7 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
       {
         if (tokens[0] == "PASS")
           pass(fds.fd, tokens[1]);
-        else if (!clients[fds.fd].getPassFlag())
+        else if (tokens[0] != "" && !clients[fds.fd].getPassFlag())
           throw std::string("password does not exist");
       }
       executeCommand(fds.fd, tokens);

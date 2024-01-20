@@ -12,7 +12,6 @@ void Server::quit(int fd) {
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       // 유저가 한명일 때, 채널 두 개 들어갔다가 나가면 세그폴트
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      channels[i].removeUser(fd, users);
 
       // operator인 경우 operator 목록에서 제거
       std::vector<int> ops = channels[i].getOperators();
@@ -21,11 +20,17 @@ void Server::quit(int fd) {
         channels[i].removeOperator(fd);
       }
 
-      // 채널에 속한 모든 user에게 quit 메시지 보내기
-      std::string se = ":" + clients[fd].getNick() + "!" +
-                       clients[fd].getUserFd() + "@" +
-                       clients[fd].getServerName() + " QUIT :leaving\r\n";
-      sendString(se, channels[i].getUserFds());
+      std::cout << "aaaaaaaaaaaaaa\n " << std::endl;
+      channels[i].removeUser(fd);
+      std::cout << "hererererereree\n" << std::endl;
+
+      // 채널에 속한 모든 user에게 quit메시지 보내기
+      if (channels[i].getUserFds().size() > 0) {
+        std::string se = ":" + clients[fd].getNick() + "!" +
+                         clients[fd].getUserFd() + "@" +
+                         clients[fd].getServerName() + " QUIT :leaving\r\n";
+        sendString(se, channels[i].getUserFds());
+      }
     }
   }
   // server에 quit 메시지 보내기
@@ -34,3 +39,6 @@ void Server::quit(int fd) {
 
   sendString(se, fd);
 }
+
+// quit하고 나갔을 때 채널 제대로 안 없어짐!
+//
