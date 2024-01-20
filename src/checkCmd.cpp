@@ -94,13 +94,13 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
       ;
     else {
       std::vector<std::string> tokens = splitCommand(str);
-      {
+      
         if (tokens[0] == "PASS")
           pass(fds.fd, tokens[1]);
         else if (tokens[0] != "" && !clients[fds.fd].getPassFlag())
           throw std::string("password does not exist");
-      }
-      executeCommand(fds.fd, tokens);
+        else
+          executeCommand(fds.fd, tokens);
     }
   }
 }

@@ -30,4 +30,6 @@ void Server::topic(int fd, std::vector<std::string> tokens) {
           " :You do not have access to change the topic on this channel\r\n";
   }
   sendString(se, fd);
+
+  // mode +t 일때 운영자만 가능 추가하기
 }
