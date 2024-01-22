@@ -2,6 +2,7 @@
 
 void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   std::string target = tokens[1];
+  std::string message = tokens[2];
 
   // PRIVMSG target :babo
   // target이 채널이 아니면 target에게 메시지 보내기
@@ -9,15 +10,17 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
     std::string se2 = ":" + clients[fd].getNick() + "!" +
                       clients[fd].getUserFd() + "@" +
                       clients[fd].getServerName() + " " + cmd + " " + target +
-                      " :" + tokens[2] + "\r\n";
+                      " :" + message + "\r\n";
+
     // users에서 user 찾기
-    // for (unsigned int i = 0; i < clients.size(); i++) {
-    //   if (clients[i].getNick() == tokens[1]) {
-    //     sendString(se2, i);
-    //     return;
-    //   }
-    // }
-    if (isUser(target) >= 0) sendString(se2, i);
+    int target_fd = isUser(target);
+
+    // 보내는 타겟이 자신이면 보내지 않기
+    if (fd == target_fd)
+      ;
+    else if (target_fd >= 0) {
+      sendString(se2, target_fd);
+    }
     // 보내려는 유저가 없으면 에러
     // :irc.local 401 root hi :No such nick
     else {
@@ -34,19 +37,13 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
 
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    "@" + clients[fd].getServerName() + " " + cmd + " " +
-                   target + " :" + tokens[2] + "\r\n";
+                   target + " :" + message + "\r\n";
 
-  // 채널 이름으로 채널 찾기
-  // unsigned int i = 0;
-  // for (; i < channels.size(); i++) {
-  //   if (channels[i].getChannelName() == name) {
-  //     break;
-  //   }
-  // }
   int channel_idx = isChannel(name);
   if (channel_idx >= 0) {
     std::vector<int> users = channels[channel_idx].getUserFds();
     users.erase(std::remove(users.begin(), users.end(), fd), users.end());
+
     sendString(se, users);
   }
   // !!!!!!else

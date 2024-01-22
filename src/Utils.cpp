@@ -1,8 +1,5 @@
 #include "Utils.hpp"
 
-#include <unistd.h>
-
-#include <iostream>
 #include <vector>
 
 void sendString(std::string str, int fd) {

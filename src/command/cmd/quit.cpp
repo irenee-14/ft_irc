@@ -2,9 +2,10 @@
 
 void Server::quit(int fd) {
   for (unsigned int i = 0; i < channels.size(); ++i) {
-    // 속해있는 채널에서 나가기
+    // 채널에 user가 포함되어 있는지 확인
     if (channels[i].isUser(fd) >= 0) {
       // operator인 경우 operator 목록에서 제거
+
       if (channels[i].isOperator(fd) >= 0) {
         channels[i].removeOperator(fd);
       }

@@ -95,13 +95,10 @@ void Channel::addUser(int user_fd, std::string user_nick) {
 }
 
 void Channel::removeUser(int find) {
-  std::cout << "user_fd.size : " << this->_user_fds.size() << std::endl;
-  std::cout << "user_nick.size: " << this->_user_nicks.size() << std::endl;
   for (unsigned int i = 0; i < this->_user_fds.size(); i++) {
     if (this->_user_fds[i] == find) {
       this->_user_fds.erase(this->_user_fds.begin() + i);
       this->_user_nicks.erase(this->_user_nicks.begin() + i);
-      std::cout << "asdfasdfasdf" << std::endl;
       break;
     }
   }

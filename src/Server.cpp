@@ -12,7 +12,7 @@
 Server::Server(void) {}
 
 Server::Server(char** argv) {
-  this->password = argv[2];
+  this->_password = argv[2];
   // 서버 소켓 생성
   serv_fd = socket(PF_INET, SOCK_STREAM, 0);
   if (this->serv_fd == -1) throw std::string("socket()");
@@ -110,9 +110,8 @@ void Server::acceptLoop() {
 
         // 클라이언트 새로 생성 후 fd 할당
         clients[clnt_sock] = Client(clnt_sock);
-
-        std::cout << "connected client: " << clnt_sock << std::endl
-                  << std::endl;
+        printArg("\n===============================================\n", 0);
+        printArg("connected client: ", clnt_sock);
       }
       continue;
     }
@@ -123,7 +122,7 @@ void Server::acceptLoop() {
       {
         close(fds[i].fd);
         fds.erase(fds.begin() + i);
-        std::cout << "closed client: " << fds[i].fd << std::endl;
+        printArg("closed client: ", fds[i].fd);
       } else if (fds[i].revents & POLLIN) {
         char buf[BUF_SIZE];
         int str_len;
@@ -137,6 +136,8 @@ void Server::acceptLoop() {
         buf[str_len++] = '\0';
         {
           write(1, buf, str_len);
+
+          printArg("\n-----------------------------------------------\n", 0);
           try {
             checkCommand(fds[i], buf);
           } catch (std::string exception) {
@@ -147,11 +148,9 @@ void Server::acceptLoop() {
 
             close(fds[i].fd);
             fds.erase(fds.begin() + i);
-            std::cout << "closed client: " << fds[i].fd << std::endl;
+            printArg("closed client: ", fds[i].fd);
           }
-          std::string check =
-              "\n-----------------------------------------------\n\n";
-          write(1, check.c_str(), std::strlen(check.c_str()));
+          printArg("\n===============================================\n", 0);
         }
       }
     }
@@ -159,19 +158,19 @@ void Server::acceptLoop() {
 }
 
 // ----------------------------------------------------------------------
+
 int Server::isChannel(std::string channel_name) {
   for (unsigned int i = 0; i < channels.size(); i++) {
     if (channels[i].getChannelName() == channel_name) {
-      std::cout << "i : " << i << std::endl;
       return (i);
     }
   }
   return (-1);
 }
 
-int Server::isUser(std::string user_nick) {
+int Server::isUser(std::string nickname) {
   for (unsigned int i = 0; i < clients.size(); i++) {
-    if (clients[i].getNick() == user_nick) {
+    if (clients[i].getNick() == nickname) {
       return (i);
     }
   }
