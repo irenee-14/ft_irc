@@ -156,9 +156,9 @@ int Channel::isUser(int fd) {
   return (-1);
 }
 
-int Channel::isUser(std::string user_nick) {
+int Channel::isUser(std::string nickname) {
   for (unsigned int i = 0; i < this->_user_nicks.size(); i++) {
-    if (this->_user_nicks[i] == user_nick) return (i);
+    if (this->_user_nicks[i] == nickname) return (i);
   }
   return (-1);
 }

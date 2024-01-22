@@ -81,7 +81,7 @@ class Channel {
 
   // ----------------------------------------------------
   int isUser(int fd);
-  int isUser(std::string user_nick);
+  int isUser(std::string nickname);
   int isOperator(int fd);
 };
 
