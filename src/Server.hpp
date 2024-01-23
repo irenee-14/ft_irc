@@ -14,7 +14,7 @@
 #include "Utils.hpp"
 
 enum command_enum {
-  NICK = 0,
+  NICK = 1,
   USER,
   USERHOST,
   PING,
@@ -72,7 +72,7 @@ class Server {
 
   // ---------------------------- cmd ----------------------------
 
-  void list(int fd, std::string channel);
+  void list(int fd, std::vector<std::string> tokens);
   void nick(int fd, std::string nickname);
   void pass(int fd, std::string password);
   void pong(int fd);

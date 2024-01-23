@@ -7,15 +7,19 @@ const std::string strList(Client client, Channel channel) {
           channel.getModes() + "]\r\n");
 }
 
-void Server::list(int fd, std::string channel) {
-  printArg("channel size : ", channels.size());
+void Server::list(int fd, std::vector<std::string> tokens) {
+  std::string channel = tokens[1];
+
+  unsigned int size = channels.size();
+
+  printArg("channel size : ", size);
 
   std::string se = ":" + clients[fd].getServerName() + " 321 " +
                    clients[fd].getNick() + " Channel :Users Name\r\n";
 
-  if (channels.size() > 0) {
+  if (size > 0) {
     // LIST #channel
-    if (channel != "") {
+    if (tokens.size() > 1) {
       std::string channelNoHash = channel.substr(1, channel.size() - 1);
 
       int channel_idx = isChannel(channelNoHash);
@@ -25,7 +29,7 @@ void Server::list(int fd, std::string channel) {
     }
     // LIST : 모든 채널 정보 출력
     else {
-      for (unsigned int i = 0; i < channels.size(); ++i) {
+      for (unsigned int i = 0; i < size; ++i) {
         se += strList(clients[fd], channels[i]);
       }
     }

@@ -2,12 +2,15 @@
 
 #include "Server.hpp"
 
-std::vector<std::string> splitCommand(const std::string& str) {
+std::vector<std::string> splitCommand(const std::string str) {
   std::vector<std::string> result;
   std::string temp;
   bool hasColon = false;
 
-  std::stringstream ss(str);
+  std::stringstream ss;
+  ss.str("");
+  ss << str;
+
   char c;
 
   while (ss.get(c)) {
@@ -24,7 +27,7 @@ std::vector<std::string> splitCommand(const std::string& str) {
       temp += c;
   }
   if (!temp.empty()) result.push_back(temp);
-
+  ss.str("");
   return (result);
 }
 
@@ -44,7 +47,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
       pong(fd);
       break;
     case LIST:
-      list(fd, tokens[1]);
+      list(fd, tokens);
       break;
     case WHOIS:
       whois(fd, tokens[1]);
@@ -81,10 +84,15 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
 }
 
 void Server::checkCommand(struct pollfd fds, char* buf) {
-  std::stringstream ss(buf);
+  std::stringstream ss;
+  ss.str("");
+  ss << buf;
+
   std::string line;
 
-  while (std::getline(ss, line) && line.c_str()[line.length() - 1] == '\r') {
+  while (std::getline(ss, line)) {
+    if (line.c_str()[line.length() - 1] != '\r') break;
+
     std::string str = line.substr(0, line.find("\r"));
 
     if (str.find("CAP LS") == 0) {
@@ -101,6 +109,17 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
         throw std::string("password does not exist");
       else
         executeCommand(fds.fd, tokens);
+
+      if (!clients[fds.fd].getNickFlag() && clients[fds.fd].getNick() != "" &&
+          clients[fds.fd].getUser() != "") {
+        clients[fds.fd].setTimestamp(time(0));
+        std::string se = ":" + clients[fds.fd].getServerName() + " 001 " +
+                         clients[fds.fd].getNick() + " :Welcome\r\n";
+        sendString(se, fds.fd);
+        clients[fds.fd].setNickFlag(true);
+      }
     }
+    line.clear();
   }
+  ss.str("");
 }
