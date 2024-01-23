@@ -14,9 +14,6 @@ void Server::list(int fd, std::vector<std::string> tokens) {
 
   printArg("channel size : ", size);
 
-  std::string se = ":" + SERVER_NAME + " 321 " + clients[fd].getNick() +
-                   " Channel :Users Name\r\n";
-
   if (size > 0) {
     // LIST #channel
     if (tokens.size() > 1) {
