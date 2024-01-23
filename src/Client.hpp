@@ -16,6 +16,7 @@ class Client {
   std::string _server_name;
   u_int32_t _timestamp;
   bool _pass_flag;
+  bool _nick_flag;
 
  public:
   Client(void);
@@ -31,8 +32,10 @@ class Client {
   void setUser(const std::string user);
   void setRealName(const std::string real);
   void setServerName(const std::string server_name);
-  void setPassFlag(const bool flag);
+
   void setTimestamp(const u_int32_t timestamp);
+  void setPassFlag(const bool flag);
+  void setNickFlag(const bool flag);
 
   // ----------------------------------------------------
 
@@ -44,6 +47,7 @@ class Client {
   std::string getServerName(void) const;
   u_int32_t getTimestamp(void) const;
   bool getPassFlag(void) const;
+  bool getNickFlag(void) const;
 };
 
 #endif

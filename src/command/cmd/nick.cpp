@@ -14,18 +14,11 @@ void Server::nick(int fd, std::string nickname) {
   }
 
   // nickname 설정
-  clients[fd].setNick(nickname);
+
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
                    "@" + clients[fd].getServerName() + " NICK :" + nickname +
                    "\r\n";
 
+  clients[fd].setNick(nickname);
   sendString(se, fd);
-
-  // nick, user 다 들어왔을 때 welcome, daily message 보내는 함수 빼기
-  if (clients[fd].getNick() != "" && clients[fd].getUser() != "") {
-    clients[fd].setTimestamp(time(0));
-    std::string se = ":" + clients[fd].getServerName() + " 001 " +
-                     clients[fd].getNick() + " :Welcome\r\n";
-    sendString(se, fd);
-  }
 }
