@@ -1,22 +1,12 @@
 #include "Server.hpp"
 
 void Server::quit(int fd) {
-  // 채널에서 나가기
   for (unsigned int i = 0; i < channels.size(); ++i) {
-    std::vector<int> users = channels[i].getUserFds();
-
-    std::vector<int>::iterator it = std::find(users.begin(), users.end(), fd);
-
-    if (it != users.end()) {
-      // 속해있는 채널에서 나가기
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // 유저가 한명일 때, 채널 두 개 들어갔다가 나가면 세그폴트
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+    // 채널에 user가 포함되어 있는지 확인
+    if (channels[i].isUser(fd) >= 0) {
       // operator인 경우 operator 목록에서 제거
-      std::vector<int> ops = channels[i].getOperators();
-      std::vector<int>::iterator it2 = std::find(ops.begin(), ops.end(), fd);
-      if (it2 != ops.end()) {
+
+      if (channels[i].isOperator(fd) >= 0) {
         channels[i].removeOperator(fd);
       }
 
@@ -37,6 +27,3 @@ void Server::quit(int fd) {
 
   sendString(se, fd);
 }
-
-// quit하고 나갔을 때 채널 제대로 안 없어짐!
-//

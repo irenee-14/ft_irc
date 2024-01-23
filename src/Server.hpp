@@ -35,9 +35,12 @@ class Server {
   int serv_fd;
   struct sockaddr_in serv_adr;
   std::vector<struct pollfd> fds;
+
   // -------------------------------------------------------------
-  std::string password;
+
+  std::string _password;
   std::map<std::string, int> command_list;
+
   // -------------------------------------------------------------
   std::map<int, Client> clients;
   std::vector<Channel> channels;
@@ -69,29 +72,33 @@ class Server {
 
   // ---------------------------- cmd ----------------------------
 
-  void pass(int fd, std::string token);
-  void nick(int fd, std::string token);
+  void list(int fd, std::string channel);
+  void nick(int fd, std::string nickname);
+  void pass(int fd, std::string password);
+  void pong(int fd);
+  void quit(int fd);
   void user(int fd, std::vector<std::string> tokens);
   void userhost(int fd, std::vector<std::string> tokens);
-  void pong(int fd);
-  void list(int fd, std::vector<std::string> tokens);
-  void whois(int fd, std::string token);
-  void quit(int fd);
+  void whois(int fd, std::string nickname);
 
   // ----------------------- cmdInChannel -------------------------
 
-  void join(int fd, std::string token);
+  void invite(int fd, std::vector<std::string> tokens);
   std::string userList(Channel& channel);
-  void part(int fd, std::string token);
+  void join(int fd, std::string channel);
+  void kick(int fd, std::vector<std::string> tokens);
+  void part(int fd, std::string channel);
 
+  void privateMsg(int fd, std::vector<std::string> tokens);
   void msg(int fd, std::vector<std::string> tokens, std::string cmd);
   void notice(int fd, std::vector<std::string> tokens);
-  void privateMsg(int fd, std::vector<std::string> tokens);
 
-  void kick(int fd, std::vector<std::string> tokens);
   void topic(int fd, std::vector<std::string> tokens);
 
-  void invite(int fd, std::vector<std::string> tokens);
+  // --------------------------------------------------------------
+
+  int isChannel(std::string channel_name);
+  int isUser(std::string nickname);
 };
 
 #endif

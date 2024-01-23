@@ -1,33 +1,32 @@
 #include "Server.hpp"
 
-void Server::list(int fd, std::vector<std::string> tokens) {
+const std::string strList(Client client, Channel channel) {
+  return (":" + client.getServerName() + " 322 " + client.getNick() + " #" +
+          channel.getChannelName() + " " +
+          std::to_string(channel.getUserFds().size()) + " :[+" +
+          channel.getModes() + "]\r\n");
+}
+
+void Server::list(int fd, std::string channel) {
+  printArg("channel size : ", channels.size());
+
   std::string se = ":" + clients[fd].getServerName() + " 321 " +
                    clients[fd].getNick() + " Channel :Users Name\r\n";
-  std::cout << "channel size : " << channels.size() << std::endl;
 
   if (channels.size() > 0) {
     // LIST #channel
-    // # 제거하고 채널 이름과 비교해서 채널 정보 출력
-    if (tokens.size() > 1) {
-      std::string name = tokens[1].substr(1, tokens[1].size() - 1);
+    if (channel != "") {
+      std::string channelNoHash = channel.substr(1, channel.size() - 1);
 
-      for (unsigned int i = 0; i < channels.size(); ++i) {
-        if (channels[i].getChannelName() == name) {
-          se += ":" + clients[fd].getServerName() + " 322 " +
-                clients[fd].getNick() + " #" + channels[i].getChannelName() +
-                " " + std::to_string(channels[i].getUserFds().size()) + " :[+" +
-                channels[i].getModes() + "]\r\n";
-        }
+      int channel_idx = isChannel(channelNoHash);
+      if (channel_idx >= 0) {
+        se += strList(clients[fd], channels[channel_idx]);
       }
     }
-    // LIST
-    // 모든 채널 정보 출력
+    // LIST : 모든 채널 정보 출력
     else {
       for (unsigned int i = 0; i < channels.size(); ++i) {
-        se += ":" + clients[fd].getServerName() + " 322 " +
-              clients[fd].getNick() + " #" + channels[i].getChannelName() +
-              " " + std::to_string(channels[i].getUserFds().size()) + " :[+" +
-              channels[i].getModes() + "]\r\n";
+        se += strList(clients[fd], channels[i]);
       }
     }
   }
@@ -35,3 +34,5 @@ void Server::list(int fd, std::vector<std::string> tokens) {
         " :End of channel list.\r\n";
   sendString(se, fd);
 }
+
+// 헷갈리는 부분 : list 여러개 확인 못 했었나?

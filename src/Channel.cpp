@@ -95,13 +95,10 @@ void Channel::addUser(int user_fd, std::string user_nick) {
 }
 
 void Channel::removeUser(int find) {
-  std::cout << "user_fd.size : " << this->_user_fds.size() << std::endl;
-  std::cout << "user_nick.size: " << this->_user_nicks.size() << std::endl;
   for (unsigned int i = 0; i < this->_user_fds.size(); i++) {
     if (this->_user_fds[i] == find) {
       this->_user_fds.erase(this->_user_fds.begin() + i);
       this->_user_nicks.erase(this->_user_nicks.begin() + i);
-      std::cout << "asdfasdfasdf" << std::endl;
       break;
     }
   }
@@ -145,9 +142,23 @@ std::string Channel::getModes(void) {
 // 인자로 어느 채널인지 받아서 그 채널의 operator인지 확인
 // operator이면 true, 아니면 false
 
-bool Channel::isOperator(int fd) {
-  std::vector<int>::iterator it =
-      std::find(this->_operator.begin(), this->_operator.end(), fd);
-  if (it != this->_operator.end()) return (true);
-  return (false);
+int Channel::isOperator(int fd) {
+  for (unsigned int i = 0; i < this->_operator.size(); i++) {
+    if (this->_operator[i] == fd) return (i);
+  }
+  return (-1);
+}
+
+int Channel::isUser(int fd) {
+  for (unsigned int i = 0; i < this->_user_fds.size(); i++) {
+    if (this->_user_fds[i] == fd) return (i);
+  }
+  return (-1);
+}
+
+int Channel::isUser(std::string nickname) {
+  for (unsigned int i = 0; i < this->_user_nicks.size(); i++) {
+    if (this->_user_nicks[i] == nickname) return (i);
+  }
+  return (-1);
 }
