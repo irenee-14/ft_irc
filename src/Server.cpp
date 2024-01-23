@@ -63,21 +63,21 @@ Server& Server::operator=(Server const& rhs) {
 
 void Server::initializeCommandList() {
   if (command_list.empty()) {
-    command_list["NICK"] = 0;
-    command_list["USER"] = 1;
-    command_list["userhost"] = 2;
-    command_list["PING"] = 3;
-    command_list["LIST"] = 4;
-    command_list["WHOIS"] = 5;
-    command_list["JOIN"] = 6;
-    command_list["PART"] = 7;
-    command_list["PRIVMSG"] = 8;
-    command_list["NOTICE"] = 9;
-    command_list["KICK"] = 10;
-    command_list["INVITE"] = 11;
-    command_list["TOPIC"] = 12;
-    command_list["MODE"] = 13;
-    command_list["QUIT"] = 14;
+    command_list["NICK"] = 1;
+    command_list["USER"] = 2;
+    command_list["userhost"] = 3;
+    command_list["PING"] = 4;
+    command_list["LIST"] = 5;
+    command_list["WHOIS"] = 6;
+    command_list["JOIN"] = 7;
+    command_list["PART"] = 8;
+    command_list["PRIVMSG"] = 9;
+    command_list["NOTICE"] = 10;
+    command_list["KICK"] = 11;
+    command_list["INVITE"] = 12;
+    command_list["TOPIC"] = 13;
+    command_list["MODE"] = 14;
+    command_list["QUIT"] = 15;
   }
 }
 // ---------------------------------------------------------------
@@ -125,8 +125,12 @@ void Server::acceptLoop() {
         printArg("closed client: ", fds[i].fd);
       } else if (fds[i].revents & POLLIN) {
         char buf[BUF_SIZE];
+        memset(buf, 0, BUF_SIZE);
+
         int str_len;
+
         str_len = recv(fds[i].fd, buf, BUF_SIZE, 0);
+
         //  ctrl + D
         //  if (str_len == 0) {
         //    close(fds[i].fd);
@@ -140,6 +144,7 @@ void Server::acceptLoop() {
           printArg("\n-----------------------------------------------\n", 0);
           try {
             checkCommand(fds[i], buf);
+            memset(buf, 0, BUF_SIZE);
           } catch (std::string exception) {
             // client에게도 에러 메시지 보내줘야함
             std::string se =
