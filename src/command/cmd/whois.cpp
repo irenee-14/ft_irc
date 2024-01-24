@@ -26,36 +26,6 @@ void Server::whois(int fd, std::string nickname) {
                    clients[fd].getUser() + " " + clients[fd].getServerName() +
                    " * :" + clients[fd].getRealName() + "\r\n";
 
-  // :irc.local 378 root root :is connecting from root@127.0.0.1 127.0.0.1 -
-  // 자기 자신에 대해서만 출력
-  if (nickname == clients[fd].getNick()) {
-    se += ":" + clients[fd].getServerName() + " 378 " + clients[fd].getNick() +
-          " " + nickname + " :is connecting from " + clients[fd].getUser() +
-          " " + clients[fd].getServerName() + "\r\n";
-  }
-
-  // :irc.local 319 root root :@#hello @#hi
-  // 속한 채널이 있으면 출력, operator면 @ 붙여서 출력
-  bool hasChannel = false;
-  for (unsigned int i = 0; i < channels.size(); ++i) {
-    int user_idx = channels[i].isUser(fd);
-
-    if (user_idx >= 0) {
-      if (!hasChannel) {
-        se += ":" + clients[fd].getServerName() + " 319 " +
-              clients[fd].getNick() + " " + nickname + " :";
-        hasChannel = true;
-      }
-      int op_idx = channels[i].isOperator(fd);
-
-      if (op_idx > 0) se += "@";
-
-      se += "#" + channels[i].getChannelName() + " ";
-    }
-  }
-  if (hasChannel) se += "\r\n";
-
-  // :irc.local 312 root root irc.local :Local IRC Server
   se += ":" + clients[fd].getServerName() + " 312 " + clients[fd].getNick() +
         " " + nickname + " " + clients[fd].getServerName() +
         " :Local IRC Server\r\n";
