@@ -30,6 +30,15 @@ enum command_enum {
   MODE,
   QUIT
 };
+
+typedef struct s_mode {
+  bool _isAddMode;
+  char _option;
+  std::string _arg;
+  s_mode(bool isAddMode, char option, std::string arg)
+      : _isAddMode(isAddMode), _option(option), _arg(arg) {}
+} t_mode;
+
 class Server {
  private:
   int serv_fd;
@@ -42,6 +51,7 @@ class Server {
   std::map<std::string, int> command_list;
 
   // -------------------------------------------------------------
+  // ????????clients fd 그대로 쓸 수 있는거 확인해서 바꾸기
   std::map<int, Client> clients;
   std::vector<Channel> channels;
 
@@ -94,6 +104,7 @@ class Server {
   void notice(int fd, std::vector<std::string> tokens);
 
   void topic(int fd, std::vector<std::string> tokens);
+  void mode(int fd, std::vector<std::string> tokens);
 
   // --------------------------------------------------------------
 
