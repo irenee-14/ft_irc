@@ -85,10 +85,10 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
 
   // 채널에 속한 모든 user에게 보내는 메시지
   //   :irc.local NOTICE #hi :*** root invited root_ into the channel
-  std::string se3 =
-      ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() + "@" +
-      clients[fd].getServerName() + " NOTICE " + channel + " :*** " +
-      clients[fd].getNick() + " invited " + user + " into the channel\r\n";
+  std::string se3 = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+                    "@" + clients[fd].getServerName() + " NOTICE " + channel +
+                    " :*** " + clients[fd].getNick() + " invited " + user +
+                    " into the channel\r\n";
 
   std::vector<int> users = channels[channel_idx].getUserFds();
   users.erase(std::remove(users.begin(), users.end(), fd), users.end());

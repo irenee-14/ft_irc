@@ -23,14 +23,14 @@ void Server::whois(int fd, std::string nickname) {
 
   std::string se = ":" + clients[fd].getServerName() + " 311 " +
                    clients[fd].getNick() + " " + nickname + " " +
-                   clients[fd].getUserFd() + " " + clients[fd].getServerName() +
+                   clients[fd].getUser() + " " + clients[fd].getServerName() +
                    " * :" + clients[fd].getRealName() + "\r\n";
 
   // :irc.local 378 root root :is connecting from root@127.0.0.1 127.0.0.1 -
   // 자기 자신에 대해서만 출력
   if (nickname == clients[fd].getNick()) {
     se += ":" + clients[fd].getServerName() + " 378 " + clients[fd].getNick() +
-          " " + nickname + " :is connecting from " + clients[fd].getUserFd() +
+          " " + nickname + " :is connecting from " + clients[fd].getUser() +
           " " + clients[fd].getServerName() + "\r\n";
   }
 

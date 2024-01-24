@@ -8,7 +8,7 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   // target이 채널이 아니면 target에게 메시지 보내기
   if (target[0] != '#') {
     std::string se2 = ":" + clients[fd].getNick() + "!" +
-                      clients[fd].getUserFd() + "@" +
+                      clients[fd].getUser() + "@" +
                       clients[fd].getServerName() + " " + cmd + " " + target +
                       " :" + message + "\r\n";
 
@@ -35,7 +35,7 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   // 채널에 속해있는 모든 유저에게 메시지 보내기
   std::string name = target.substr(1, target.size() - 1);
 
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " " + cmd + " " +
                    target + " :" + message + "\r\n";
 

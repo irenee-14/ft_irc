@@ -20,7 +20,7 @@ void Server::userhost(int fd, std::vector<std::string> tokens) {
   for (unsigned int i = 1; i < tokens.size(); ++i) {
     int user_fd = isUser(tokens[i]);
     if (user_fd > 0) {
-      se += clients[user_fd].getNick() + "=+" + clients[user_fd].getUserFd() +
+      se += clients[user_fd].getNick() + "=+" + clients[user_fd].getUser() +
             "@" + clients[user_fd].getServerName() + " ";
     }
   }
