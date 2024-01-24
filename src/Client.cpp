@@ -44,7 +44,6 @@ void Client::setPassFlag(const bool flag) { _pass_flag = flag; }
 void Client::setNickFlag(const bool flag) { _nick_flag = flag; }
 
 int Client::getFd(void) const { return (_clnt_fd); }
-std::string Client::getUserFd(void) const { return (_user); }
 std::string Client::getNick(void) const { return (_nick); }
 std::string Client::getUser(void) const { return (_user); }
 std::string Client::getRealName(void) const { return (_real_name); }

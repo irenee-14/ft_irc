@@ -73,7 +73,7 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   // 모든 조건 만족하면 invite 보내기
 
   // target에게 보내는 메시지
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " INVITE " + user +
                    " #" + channelNoHash + "\r\n";
   sendString(se, target_fd);
