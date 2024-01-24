@@ -38,13 +38,11 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
   bool isAddMode = true;
 
   if (channel_idx < 0) return;
-
   // tokens[2] 에 값이 없을 때 채널의 현재 모드 정보 출력
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!
   if (tokens.size() < 3) return;
 
   std::string modeStr = tokens[2];
-
   // tokens에서 3번째부터 끝까지 모드 인자로 받기
   std::vector<std::string> modeArgs =
       std::vector<std::string>(tokens.begin() + 3, tokens.end());

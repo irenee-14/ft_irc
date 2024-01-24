@@ -25,6 +25,10 @@ class Channel {
 
   Channel(void);
 
+  // 127.000.000.001.04242-127.000.000.001.41124: :root!root@127.0.0.1 MODE #hi
+  // +k :asdf 127.000.000.001.04242-127.000.000.001.41124: :root!root@127.0.0.1
+  // MODE #hi +kl asdf :3
+
  public:
   Channel(const Channel& src);
   Channel(std::string channel_name);
