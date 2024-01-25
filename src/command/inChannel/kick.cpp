@@ -15,7 +15,7 @@ void Server::kick(int fd, std::vector<std::string> tokens) {
     if (channels[channel_idx].isOperator(fd) >= 0) {
       // kick하려는 target이 channel에 존재하면 메시지 보내기
       if (channels[channel_idx].isUser(target) >= 0) {
-        se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() + "@" +
+        se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() + "@" +
              clients[fd].getServerName() + " KICK " + channel + " " + target +
              " :" + tokens[3] + "\r\n";
 

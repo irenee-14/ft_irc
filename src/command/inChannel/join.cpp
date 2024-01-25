@@ -36,7 +36,7 @@ void Server::join(int fd, std::string channel) {
   }
 
   // 채널에 속한 모든 user에게 join 메시지 보내기
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() +
+  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " JOIN :" + channel +
                    "\r\n";
   // ??? 채널 들어온 사람한테는 ** has joined #channel 메시지 안 띄우지 않았나??

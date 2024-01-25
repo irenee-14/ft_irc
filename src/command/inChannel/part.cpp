@@ -16,7 +16,7 @@ void Server::part(int fd, std::string channel) {
     return;
   } else {
     std::string se = ":" + clients[fd].getNick() + "!" +
-                     clients[fd].getUserFd() + " PART :" + channel + "\r\n";
+                     clients[fd].getUser() + " PART :" + channel + "\r\n";
 
     sendString(se, channels[channel_idx].getUserFds());
 

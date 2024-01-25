@@ -17,7 +17,7 @@ void Server::topic(int fd, std::vector<std::string> tokens) {
     if (channels[channel_idx].isOperator(fd) >= 0) {
       channels[channel_idx].setTopic(topic);
 
-      se += ":" + clients[fd].getNick() + "!" + clients[fd].getUserFd() + "@" +
+      se += ":" + clients[fd].getNick() + "!" + clients[fd].getUser() + "@" +
             clients[fd].getServerName() + " TOPIC " + channel + " :" + topic +
             "\r\n";
 

@@ -5,7 +5,7 @@
 #include <vector>
 
 // mode enum
-enum { i = 0, k, l, n, t };
+enum { i = 0, k, l, t };
 
 class Channel {
  private:
@@ -14,14 +14,20 @@ class Channel {
   std::vector<std::string> _user_nicks;
   // -------------------------------------------------------------
   int _mode[5];
+
   std::string _topic;
   std::string _key;
+  int _limit;
   // -------------------------------------------------------------
   std::vector<int> _operator;
-  std::vector<int> _ban_list;
   std::vector<int> _invite_list;
   // -------------------------------------------------------------
+
   Channel(void);
+
+  // 127.000.000.001.04242-127.000.000.001.41124: :root!root@127.0.0.1 MODE #hi
+  // +k :asdf 127.000.000.001.04242-127.000.000.001.41124: :root!root@127.0.0.1
+  // MODE #hi +kl asdf :3
 
  public:
   Channel(const Channel& src);
@@ -40,9 +46,9 @@ class Channel {
 
   std::string getTopic() const;
   std::string getKey() const;
+  int getLimit() const;
 
   std::vector<int> getOperators() const;
-  std::vector<int> getBanList() const;
   std::vector<int> getInviteList() const;
 
   // ----------------------------------------------------
@@ -53,9 +59,9 @@ class Channel {
 
   void setTopic(std::string topic);
   void setKey(std::string key);
+  void setLimit(int limit);
 
   void setOperator(std::vector<int> op);
-  void setBanList(std::vector<int> ban_list);
   void setInviteList(std::vector<int> invite_list);
 
   // ----------------------------------------------------

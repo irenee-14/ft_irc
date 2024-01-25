@@ -15,14 +15,14 @@ void Server::quit(int fd) {
       // 채널에 속한 모든 user에게 quit메시지 보내기
       if (channels[i].getUserFds().size() > 0) {
         std::string se = ":" + clients[fd].getNick() + "!" +
-                         clients[fd].getUserFd() + "@" +
+                         clients[fd].getUser() + "@" +
                          clients[fd].getServerName() + " QUIT :leaving\r\n";
         sendString(se, channels[i].getUserFds());
       }
     }
   }
   // server에 quit 메시지 보내기
-  std::string se = "ERROR :Closing link: (" + clients[fd].getUserFd() + "@" +
+  std::string se = "ERROR :Closing link: (" + clients[fd].getUser() + "@" +
                    clients[fd].getServerName() + ") [Quit: leaving]\r\n";
 
   sendString(se, fd);

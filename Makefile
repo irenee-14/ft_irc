@@ -50,7 +50,8 @@ CHANNEL_FILES	=	invite.cpp \
 					kick.cpp \
 					part.cpp \
 					privMsg.cpp \
-					topic.cpp 
+					topic.cpp \
+					mode.cpp
 					
 CHANNEL			=	$(addprefix $(CHANNEL_DIR)/, $(CHANNEL_FILES))
 
