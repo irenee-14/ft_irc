@@ -75,13 +75,19 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       int user_fd = isUser(*it);
       if (user_fd < 0) {
         // 401 ERR_NOSUCHNICK
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // :irc.local 401 root nick :No such nick
+        std::string se = ":" + clients[fd].getServerName() + " 401 " +
+                         clients[fd].getNick() + " " + *it +
+                         " :No such nick\r\n";
         it++;
         continue;
       }
-      // channel에 user가 존재하지 않거나 이미 operator인 경우 continue
+      // channel에 user가 존재하지 않으면 continue
+      // isAddMode : 이미 operator인 경우 continue
+      // !isAddMode : operator가 아닌 경우 continue
       if (channels[channel_idx].isUser(user_fd) < 0 ||
-          (channels[channel_idx].isOperator(user_fd) >= 0 && isAddMode)) {
+          (channels[channel_idx].isOperator(user_fd) >= 0 && isAddMode) ||
+          (channels[channel_idx].isOperator(user_fd) < 0 && !isAddMode)) {
         it++;
         continue;
       }
