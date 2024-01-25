@@ -24,8 +24,8 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
     // 보내려는 유저가 없으면 에러
     // :irc.local 401 root hi :No such nick
     else {
-      std::string se = ":127.0.0.1 401 " + clients[fd].getNick() + " " +
-                       target + " :No such nick\r\n";
+      std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() +
+                       " " + target + " :No such nick\r\n";
       sendString(se, fd);
     }
     return;

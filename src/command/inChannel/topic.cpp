@@ -25,8 +25,8 @@ void Server::topic(int fd, std::vector<std::string> tokens) {
 
       return;
     } else {
-      se += ":" + clients[fd].getServerName() + " 482 " +
-            clients[fd].getNick() + " " + channel +
+      se += ":" + SERVER_NAME + " 482 " + clients[fd].getNick() + " " +
+            channel +
             " :You do not have access to change the topic on this channel\r\n";
     }
     sendString(se, fd);

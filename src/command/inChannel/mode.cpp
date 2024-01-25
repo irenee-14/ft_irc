@@ -64,8 +64,8 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
     else if (modeStr[i] == 'o') {
       // *it에 값 없을 경우
       if (it == modeArgs.end()) {
-        std::string se = ":" + clients[fd].getServerName() + " 696 " +
-                         clients[fd].getNick() + " " + channel +
+        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
+                         " " + channel +
                          " o * :You must specify a parameter for the op mode. "
                          "Syntax: <nick>.\r\n";
         sendString(se, fd);
@@ -101,8 +101,8 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       // key mode. Syntax: <key>.
 
       if (it == modeArgs.end()) {
-        std::string se = ":" + clients[fd].getServerName() + " 696 " +
-                         clients[fd].getNick() + " " + channel +
+        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
+                         " " + channel +
                          " k * :You must specify a parameter for the key "
                          "mode. Syntax: <key>.\r\n";
         sendString(se, fd);
@@ -133,8 +133,8 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       // mode. Syntax: <limit>.å
 
       if (isAddMode && it == modeArgs.end()) {
-        std::string se = ":" + clients[fd].getServerName() + " 696 " +
-                         clients[fd].getNick() + " " + channel +
+        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
+                         " " + channel +
                          " l * :You must specify a parameter for the limit "
                          "mode. Syntax: <limit>.\r\n";
         sendString(se, fd);

@@ -27,9 +27,8 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
 
   // invite한 channel이 존재하지 않으면 에러
   if (channel_idx < 0) {
-    std::string se = ":" + clients[fd].getServerName() + " 403 " +
-                     clients[fd].getNick() + " " + channel +
-                     " :No such channel\r\n";
+    std::string se = ":" + SERVER_NAME + " 403 " + clients[fd].getNick() + " " +
+                     channel + " :No such channel\r\n";
     sendString(se, fd);
     return;
   }
@@ -37,35 +36,32 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   // invite 받은 user가 서버에 존재하지 않으면 에러
   int target_fd = isUser(user);
   if (target_fd < 0) {
-    std::string se = ":" + clients[fd].getServerName() + " 401 " +
-                     clients[fd].getNick() + " " + user + " :No such nick\r\n";
+    std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() + " " +
+                     user + " :No such nick\r\n";
     sendString(se, fd);
     return;
   }
 
   // invite한 user가 채널에 속해있는지 않으면 에러
   if (channels[channel_idx].isUser(fd) < 0) {
-    std::string se = ":" + clients[fd].getServerName() + " 442 " +
-                     clients[fd].getNick() + " " + channel +
-                     " :You're not on that channel!\r\n";
+    std::string se = ":" + SERVER_NAME + " 442 " + clients[fd].getNick() + " " +
+                     channel + " :You're not on that channel!\r\n";
     sendString(se, fd);
     return;
   }
 
   // invite한 user가 operator가 아니면 에러
   if (channels[channel_idx].isOperator(fd) < 0) {
-    std::string se = ":" + clients[fd].getServerName() + " 482 " +
-                     clients[fd].getNick() + " " + channel +
-                     " :You must be a channel operator\r\n";
+    std::string se = ":" + SERVER_NAME + " 482 " + clients[fd].getNick() + " " +
+                     channel + " :You must be a channel operator\r\n";
     sendString(se, fd);
     return;
   }
 
   // invite 받은 user가 이미 채널에 속해있으면 에러
   if (channels[channel_idx].isUser(user) >= 0) {
-    std::string se = ":" + clients[fd].getServerName() + " 443 " +
-                     clients[fd].getNick() + " " + user + " " + channel +
-                     " :is already on channel\r\n";
+    std::string se = ":" + SERVER_NAME + " 443 " + clients[fd].getNick() + " " +
+                     user + " " + channel + " :is already on channel\r\n";
     sendString(se, fd);
     return;
   }
@@ -79,8 +75,8 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   sendString(se, target_fd);
 
   // invite를 보내는 user에게 보내는 메시지
-  std::string se2 = ":" + clients[fd].getServerName() + " 341 " +
-                    clients[fd].getNick() + " " + user + " " + channel + "\r\n";
+  std::string se2 = ":" + SERVER_NAME + " 341 " + clients[fd].getNick() + " " +
+                    user + " " + channel + "\r\n";
   sendString(se2, fd);
 
   // 채널에 속한 모든 user에게 보내는 메시지

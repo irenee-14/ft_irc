@@ -43,10 +43,11 @@ void Server::join(int fd, std::string channel) {
   sendString(se, channels[channel_idx].getUserFds());
 
   // 채널에 들어온 user에게 채널 정보 보내기
-  std::string se2 = ":127.0.0.1 353 " + clients[fd].getNick() + " = " +
-                    channel + " :" + userList(channels[channel_idx]) + "\r\n";
+  std::string se2 = ":" + SERVER_NAME + " 353 " + clients[fd].getNick() +
+                    " = " + channel + " :" + userList(channels[channel_idx]) +
+                    "\r\n";
 
-  se2 += ":127.0.0.1 366 " + clients[fd].getNick() + " " + channel +
+  se2 += ":" + SERVER_NAME + " 366 " + clients[fd].getNick() + " " + channel +
          " :End of /NAMES list.\r\n";
   sendString(se2, fd);
 }
