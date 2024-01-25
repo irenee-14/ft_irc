@@ -85,6 +85,11 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
                          " " + channel +
                          " o * :You must specify a parameter for the op mode. "
                          "Syntax: <nick>.\r\n";
+        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
+                         " " + channel +
+>>>>>>> 2609f9d... [Feat] 요청을 보내는 정보의 주체에 따라 server name 분리하여 작성
+                         " o * :You must specify a parameter for the op mode. "
+                         "Syntax: <nick>.\r\n";
         sendString(se, fd);
         continue;
       }
@@ -93,9 +98,14 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       if (user_fd < 0) {
         // 401 ERR_NOSUCHNICK
         // :irc.local 401 root nick :No such nick
+<<<<<<< HEAD
         std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() +
                          " " + *it + " :No such nick\r\n";
         " " + *it + " :No such nick\r\n";
+=======
+        std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() +
+                         " " + *it + " :No such nick\r\n";
+>>>>>>> 2609f9d... [Feat] 요청을 보내는 정보의 주체에 따라 server name 분리하여 작성
         it++;
         continue;
       }
@@ -123,8 +133,13 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       // key mode. Syntax: <key>.
 
       if (it == modeArgs.end()) {
+<<<<<<< HEAD
         std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
                          " " + channel +
+=======
+        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
+                         " " + channel +
+>>>>>>> 2609f9d... [Feat] 요청을 보내는 정보의 주체에 따라 server name 분리하여 작성
                          " k * :You must specify a parameter for the key "
                          "mode. Syntax: <key>.\r\n";
         sendString(se, fd);
@@ -156,66 +171,60 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
 
       if (isAddMode && it == modeArgs.end()) {
         std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
-                         " " + channel +
-                         " l * :You must specify a parameter for the limit "
-                         "mode. Syntax: <limit>.\r\n";
-        sendString(se, fd);
+                         " " + channel + it++;
         continue;
       }
 
-      // channel에 limit 추가
-      if (isAddMode) {
-        int retLimit = std::atoi((*it).c_str());
-        channels[channel_idx].setLimit(retLimit);
-        std::stringstream ss;
-        ss << retLimit;
-
-        modes.push_back(t_mode(isAddMode, 'l', ss.str()));
-        it++;
-      } else if (channels[channel_idx].getLimit() != -1) {
-        channels[channel_idx].setLimit(-1);
-        modes.push_back(t_mode(isAddMode, 'l', ""));
-      }
+      modes.push_back(t_mode(isAddMode, 'k', *it));
+      it++;
     }
+    // -------------------------------- "l" --------------------------------
+    else if (modeStr[i] == 'l') {
+      //*it에 값 없을 경우
+      // :irc.local 696 root #hi l * :You must specify a parameter for the
+      // limit mode. Syntax: <limit>.
 
-    // -------------------------------- "i" --------------------------------
-    else if (modeStr[i] == 'i') {
-      // if ((isAddMode && channels[channel_idx].isInviteOnly()) ||
-      //     (!isAddMode && !channels[channel_idx].isInviteOnly())) {
-      //   continue;
-      // }
-      // if (isAddMode)
-      //   channels[channel_idx].setInviteOnly(true);
-      // else
-      //   channels[channel_idx].setInviteOnly(false);
-      // modes.push_back(t_mode(isAddMode, 'i', ""));
-    }
-    // -------------------------------- "t" --------------------------------
-    else if (modeStr[i] == 't') {
-      // if ((isAddMode && channels[channel_idx].isTopic()) ||
-      //     (!isAddMode && !channels[channel_idx].isTopic())) {
-      //   continue;
-      // }
-      // if (isAddMode)
-      //   channels[channel_idx].setTopic(true);
-      // else
-      //   channels[channel_idx].setTopic(false);
-      // modes.push_back(t_mode(isAddMode, 't', ""));
-      //   channels[channel_idx].setTopic(true);
+      if (isAddMode && it == modeArgs.end()) {
+<<<<<<< HEAD
+      std::string se =
+          ":" + SERVER_NAME + " 696 " + clients[fd].getNick() + " " + channel +
+=======
+        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
+                         " " + channel +
+        // else
+        //   channels[channel_idx].setTopic(false);
+        // modes.push_back(t_mode(isAddMode, 't', ""));
+        //   channels[channel_idx].setTopic(true);
 
-      // else
-      //   channels[channel_idx].setTopic(false);
-      // modes.push_back(t_mode(isAddMode, 't', ""));
-    } else
-      ;
+        // else
+        //   channels[channel_idx].setTopic(false);
+        // modes.push_back(t_mode(isAddMode, 't', ""));
+      } else
+        ;
 
+      // 없는 모드일 경우 에러 처리
+    }  // 없는 모드일 경우 에러 처리
+    if (modes.size() == 0) return;
     // 없는 모드일 경우 에러 처리
-  }  // 없는 모드일 경우 에러 처리
-  if (modes.size() == 0) return;
-  // 없는 모드일 경우 에러 처리
-  std::string se = makeModeReply(clients[fd], channel, modes);
-  sendString(se, channels[channel_idx].getUserFds());
-  // :root!root@127.0.0.1 MODE #hi +o :root_
-  // :root!root@127.0.0.1 MODE #hi -i+o-t :root_
-  (void)fd;
+    std::string se = makeModeReply(clients[fd], channel, modes);
+    sendString(se, channels[channel_idx].getUserFds());
+    // :root!root@127.0.0.1 MODE #hi +o :root_
+    // :root!root@127.0.0.1 MODE #hi -i+o-t :root_
+    (void)fd;
+  }  // modes.push_back(t_mode(isAddMode, 't', ""));
+     //   channels[channel_idx].setTopic(true);
+
+  // else
+  //   channels[channel_idx].setTopic(false);
+  // modes.push_back(t_mode(isAddMode, 't', ""));
 }
+else;
+
+// 없는 모드일 경우 에러 처리
+}  // 없는 모드일 경우 에러 처리
+if (modes.size() == 0) return;
+// 없는 모드일 경우 에러 처리
+std::string se = makeModeReply(clients[fd], channel, modes);
+sendString(se, channels[channel_idx].getUserFds());
+// :root!root@127.0.0.1 MODE #hi +o :root_
+// :root!root@127.0.0.1 MODE #hi -i+o-t :root_
