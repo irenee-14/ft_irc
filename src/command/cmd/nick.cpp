@@ -6,8 +6,8 @@ void Server::nick(int fd, std::string nickname) {
 
   int nick_idx = isUser(nickname);
   if (nick_idx >= 0) {
-    std::string se =
-        ":127.0.0.1 433 * " + nickname + " :Nickname is already in use.\r\n";
+    std::string se = ":" + SERVER_NAME + " 433 * " + nickname +
+                     " :Nickname is already in use.\r\n";
 
     sendString(se, fd);
     return;

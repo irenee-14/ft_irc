@@ -9,14 +9,14 @@ void Server::part(int fd, std::string channel) {
   int channel_idx = isChannel(channelNoHash);
 
   if (channel[0] != '#' || channel_idx < 0) {
-    std::string se = ":127.0.0.1 403 " + clients[fd].getNick() + " " + channel +
-                     " :No such channel\r\n";
+    std::string se = ":" + SERVER_NAME + " 403 " + clients[fd].getNick() + " " +
+                     channel + " :No such channel\r\n";
     sendString(se, fd);
 
     return;
   } else {
-    std::string se = ":" + clients[fd].getNick() + "!" +
-                     clients[fd].getUser() + " PART :" + channel + "\r\n";
+    std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
+                     " PART :" + channel + "\r\n";
 
     sendString(se, channels[channel_idx].getUserFds());
 

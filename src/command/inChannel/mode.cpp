@@ -64,7 +64,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
     else if (modeStr[i] == 'o') {
       // *it에 값 없을 경우
       if (it == modeArgs.end()) {
-        std::string se = ":" + clients[fd].getServerName() + " 696 " +
+        std::string se = ":" + SERVER_NAME + " 696 " +
                          clients[fd].getNick() + " " + channel +
                          " o * :You must specify a parameter for the op mode. "
                          "Syntax: <nick>.\r\n";
@@ -76,7 +76,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       if (user_fd < 0) {
         // 401 ERR_NOSUCHNICK
         // :irc.local 401 root nick :No such nick
-        std::string se = ":" + clients[fd].getServerName() + " 401 " +
+        std::string se = ":" + SERVER_NAME + " 401 " +
                          clients[fd].getNick() + " " + *it +
                          " :No such nick\r\n";
         it++;
@@ -107,7 +107,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       // key mode. Syntax: <key>.
 
       if (it == modeArgs.end()) {
-        std::string se = ":" + clients[fd].getServerName() + " 696 " +
+        std::string se = ":" + SERVER_NAME + " 696 " +
                          clients[fd].getNick() + " " + channel +
                          " k * :You must specify a parameter for the key "
                          "mode. Syntax: <key>.\r\n";
@@ -139,7 +139,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       // mode. Syntax: <limit>.å
 
       if (isAddMode && it == modeArgs.end()) {
-        std::string se = ":" + clients[fd].getServerName() + " 696 " +
+        std::string se = ":" + SERVER_NAME + " 696 " +
                          clients[fd].getNick() + " " + channel +
                          " l * :You must specify a parameter for the limit "
                          "mode. Syntax: <limit>.\r\n";

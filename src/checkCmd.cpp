@@ -114,7 +114,7 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
       if (!clients[fds.fd].getNickFlag() && clients[fds.fd].getNick() != "" &&
           clients[fds.fd].getUser() != "") {
         clients[fds.fd].setTimestamp(time(0));
-        std::string se = ":" + clients[fds.fd].getServerName() + " 001 " +
+        std::string se = ":" + SERVER_NAME + " 001 " +
                          clients[fds.fd].getNick() + " :Welcome\r\n";
         sendString(se, fds.fd);
         clients[fds.fd].setNickFlag(true);
