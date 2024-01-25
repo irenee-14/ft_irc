@@ -95,10 +95,10 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
         // :irc.local 401 root nick :No such nick
         std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() +
                          " " + *it + " :No such nick\r\n";
+        " " + *it + " :No such nick\r\n";
         it++;
         continue;
       }
-      // channel에 user가 존재하지 않으면 continue
       // isAddMode : 이미 operator인 경우 continue
       // !isAddMode : operator가 아닌 경우 continue
       if (channels[channel_idx].isUser(user_fd) < 0 ||
@@ -151,8 +151,8 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
     // -------------------------------- "l" --------------------------------
     else if (modeStr[i] == 'l') {
       //*it에 값 없을 경우
-      // :irc.local 696 root #hi l * :You must specify a parameter for the limit
-      // mode. Syntax: <limit>.
+      // :irc.local 696 root #hi l * :You must specify a parameter for the
+      // limit mode. Syntax: <limit>.
 
       if (isAddMode && it == modeArgs.end()) {
         std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
@@ -201,21 +201,21 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       // else
       //   channels[channel_idx].setTopic(false);
       // modes.push_back(t_mode(isAddMode, 't', ""));
-    } else
-      // 없는 모드일 경우 에러 처리
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ;
-    // parsing
-    // o, i, t, k, l 일 경우 +, - 따라서 함수 실행
-    // std::map<char, std::string> option_map;
-  }
+      //   channels[channel_idx].setTopic(true);
 
-  // string 만들어서 출력
+      // else
+      //   channels[channel_idx].setTopic(false);
+      // modes.push_back(t_mode(isAddMode, 't', ""));
+    } else
+      ;
+
+    // 없는 모드일 경우 에러 처리
+  }  // 없는 모드일 경우 에러 처리
   if (modes.size() == 0) return;
+  // 없는 모드일 경우 에러 처리
   std::string se = makeModeReply(clients[fd], channel, modes);
   sendString(se, channels[channel_idx].getUserFds());
   // :root!root@127.0.0.1 MODE #hi +o :root_
   // :root!root@127.0.0.1 MODE #hi -i+o-t :root_
-
   (void)fd;
 }
