@@ -1,4 +1,5 @@
 #include <Server.hpp>
+#include <algorithm> // remove
 
 // INVITE user #channel
 

@@ -1,6 +1,7 @@
 #include "Channel.hpp"
 
 #include <iostream>
+#include <algorithm> // find
 
 Channel::Channel(void) {}
 

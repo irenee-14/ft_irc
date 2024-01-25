@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <algorithm> // remove
 
 void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   std::string target = tokens[1];

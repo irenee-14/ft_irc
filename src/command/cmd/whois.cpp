@@ -37,8 +37,8 @@ void Server::whois(int fd, std::string nickname) {
   // :irc.local 317 root root 940 1706001403 :seconds idle, signon time
   se += ":" + SERVER_NAME + " 317 " + clients[fd].getNick() + " " + nickname +
         " " +
-        std::to_string(time(0) - clients[isUser(nickname)].getTimestamp()) +
-        " " + std::to_string(clients[isUser(nickname)].getTimestamp()) +
+        intToString(time(0) - clients[isUser(nickname)].getTimestamp()) +
+        " " + intToString(clients[isUser(nickname)].getTimestamp()) +
         " :seconds idle, signon " + "time\r\n";
 
   // :irc.local 318 root root :End of /WHOIS list.

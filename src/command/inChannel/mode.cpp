@@ -1,4 +1,5 @@
 #include <sstream>  // l : stringstream
+#include <cstdlib> // atoi
 
 #include "Server.hpp"
 std::string makeModeReply(const Client client, std::string channel,
@@ -211,7 +212,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
     } else
       // 없는 모드일 경우 에러 처리
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ;
+      {}
     // parsing
     // o, i, t, k, l 일 경우 +, - 따라서 함수 실행
     // std::map<char, std::string> option_map;

@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <algorithm>  // find
 
 // join 시 채널에 있는 user들의 nick을 string으로 반환
 std::string Server::userList(Channel& channel) {

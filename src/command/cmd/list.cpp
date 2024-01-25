@@ -1,9 +1,12 @@
 #include "Server.hpp"
 
 const std::string strList(Client client, Channel channel) {
+  std::stringstream channel_size;
+   channel_size << channel.getUserFds().size();
+
   return (":" + SERVER_NAME + " 322 " + client.getNick() + " #" +
           channel.getChannelName() + " " +
-          std::to_string(channel.getUserFds().size()) + " :[+" +
+          intToString(channel.getUserFds().size()) + " :[+" +
           channel.getModes() + "]\r\n");
 }
 
