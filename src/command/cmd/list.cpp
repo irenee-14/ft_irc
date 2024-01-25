@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 const std::string strList(Client client, Channel channel) {
-  return (":" + client.getServerName() + " 322 " + client.getNick() + " #" +
+  return (":" + SERVER_NAME + " 322 " + client.getNick() + " #" +
           channel.getChannelName() + " " +
           std::to_string(channel.getUserFds().size()) + " :[+" +
           channel.getModes() + "]\r\n");
@@ -14,8 +14,8 @@ void Server::list(int fd, std::vector<std::string> tokens) {
 
   printArg("channel size : ", size);
 
-  std::string se = ":" + clients[fd].getServerName() + " 321 " +
-                   clients[fd].getNick() + " Channel :Users Name\r\n";
+  std::string se = ":" + SERVER_NAME + " 321 " + clients[fd].getNick() +
+                   " Channel :Users Name\r\n";
 
   if (size > 0) {
     // LIST #channel
@@ -34,7 +34,7 @@ void Server::list(int fd, std::vector<std::string> tokens) {
       }
     }
   }
-  se += ":" + clients[fd].getServerName() + " 323 " + clients[fd].getNick() +
+  se += ":" + SERVER_NAME + " 323 " + clients[fd].getNick() +
         " :End of channel list.\r\n";
   sendString(se, fd);
 }

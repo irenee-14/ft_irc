@@ -27,11 +27,11 @@ void Server::kick(int fd, std::vector<std::string> tokens) {
       }
 
       // 보내려는 유저가 없으면 에러
-      se = ":" + clients[fd].getServerName() + " 401 " + clients[fd].getNick() +
-           " " + target + " :No such nick\r\n";
+      se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() + " " + target +
+           " :No such nick\r\n";
     } else {
-      se = ":" + clients[fd].getServerName() + " 482 " + clients[fd].getNick() +
-           " " + channel + " :You must be a channel operator\r\n";
+      se = ":" + SERVER_NAME + " 482 " + clients[fd].getNick() + " " + channel +
+           " :You must be a channel operator\r\n";
     }
     sendString(se, fd);
   }

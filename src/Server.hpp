@@ -13,6 +13,8 @@
 #include "Client.hpp"
 #include "Utils.hpp"
 
+const std::string SERVER_NAME = "localhost";
+
 enum command_enum {
   NICK = 1,
   USER,
