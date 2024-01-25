@@ -13,7 +13,7 @@ void sendString(std::string str, std::vector<int> fds) {
 }
 
 std::string intToString(int value) {
-    std::stringstream ss;
-    ss << value;
-    return ss.str();
+  std::stringstream ss;
+  ss << value;
+  return ss.str();
 }

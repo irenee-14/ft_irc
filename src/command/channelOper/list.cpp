@@ -2,7 +2,7 @@
 
 const std::string strList(Client client, Channel channel) {
   std::stringstream channel_size;
-   channel_size << channel.getUserFds().size();
+  channel_size << channel.getUserFds().size();
 
   return (":" + SERVER_NAME + " 322 " + client.getNick() + " #" +
           channel.getChannelName() + " " +

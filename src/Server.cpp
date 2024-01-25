@@ -4,7 +4,7 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <unistd.h>  // close
-#include <cstdlib> // atoi
+#include <cstdlib>  // atoi
 
 #define BUF_SIZE 512
 
