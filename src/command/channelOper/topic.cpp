@@ -4,9 +4,13 @@
 // :joyoo!root@127.0.0.1 TOPIC #hi :hi
 
 void Server::topic(int fd, std::vector<std::string> tokens) {
-  std::string channel = tokens[1];
-  std::string channelNoHash = tokens[1].substr(1, tokens[1].size() - 1);
-  std::string topic = tokens[2];
+  const std::string channel = tokens[1];
+  const std::string channelNoHash = tokens[1].substr(1, tokens[1].size() - 1);
+  const std::string topic = tokens[2];
+
+  const std::string nickname = clients[fd].getNick();
+  const std::string username = clients[fd].getUser();
+  const std::string servername = clients[fd].getServerName();
 
   // 채널 이름으로 채널 찾기
   int channel_idx = isChannel(channelNoHash);
@@ -17,19 +21,16 @@ void Server::topic(int fd, std::vector<std::string> tokens) {
     if (channels[channel_idx].isOperator(fd) >= 0) {
       channels[channel_idx].setTopic(topic);
 
-      se += ":" + clients[fd].getNick() + "!" + clients[fd].getUser() + "@" +
-            clients[fd].getServerName() + " TOPIC " + channel + " :" + topic +
-            "\r\n";
-
+      se += ":" + nickname + "!" + username + "@" + servername + " TOPIC " +
+            channel + " :" + topic + "\r\n";
       sendString(se, channels[channel_idx].getUserFds());
-
       return;
     } else {
-      se += ":" + SERVER_NAME + " 482 " + clients[fd].getNick() + " " +
-            channel +
+      se += ":" + SERVER_NAME + " 482 " + nickname + " " + channel +
             " :You do not have access to change the topic on this channel\r\n";
     }
     sendString(se, fd);
+    // ?????? sendstring 여기서 해야하나? 엔터쳐져서 그런가?
   }
   // !!!else
   // 채널이 없는 경우

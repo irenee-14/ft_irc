@@ -4,11 +4,12 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <unistd.h>  // close
+
 #include <cstdlib>  // atoi
 
 #define BUF_SIZE 512
 
-// *****************************
+// ===============================================================
 
 Server::Server(void) {}
 
@@ -60,7 +61,7 @@ Server& Server::operator=(Server const& rhs) {
   return (*this);
 }
 
-// ---------------------------------------------------------------
+// ===============================================================
 
 void Server::initializeCommandList() {
   if (command_list.empty()) {
@@ -81,6 +82,7 @@ void Server::initializeCommandList() {
     command_list["QUIT"] = 15;
   }
 }
+
 // ---------------------------------------------------------------
 
 int Server::getServFd() const { return (this->serv_fd); }

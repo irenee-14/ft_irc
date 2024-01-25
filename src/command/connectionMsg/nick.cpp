@@ -8,7 +8,6 @@ void Server::nick(int fd, std::string nickname) {
   if (nick_idx >= 0) {
     std::string se = ":" + SERVER_NAME + " 433 * " + nickname +
                      " :Nickname is already in use.\r\n";
-
     sendString(se, fd);
     return;
   }
@@ -18,7 +17,7 @@ void Server::nick(int fd, std::string nickname) {
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " NICK :" + nickname +
                    "\r\n";
-
-  clients[fd].setNick(nickname);
+  // clients[fd].setNick(nickname);
+  // ??????????? setnick 왜 두개있지 어디서 해야하지
   sendString(se, fd);
 }

@@ -6,8 +6,6 @@
 
 #include <iostream>
 #include <map>
-#include <string>
-#include <vector>
 
 #include "Channel.hpp"
 #include "Client.hpp"
@@ -63,6 +61,8 @@ class Server {
   Server(const Server& src);
   Server& operator=(Server const& rhs);
 
+  // =============================================================
+
  public:
   Server(char** argv);
   ~Server(void);
@@ -76,29 +76,29 @@ class Server {
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
 
-  // -------------------------------------------------------------
+  // -------------------------- loop -----------------------------
 
   void acceptLoop();
   void executeCommand(int fd, std::vector<std::string> tokens);
   void checkCommand(struct pollfd fds, char* buf);
 
-  // ---------------------------- cmd ----------------------------
+  // --------------------------- is ------------------------------
 
-  void list(int fd, std::vector<std::string> tokens);
-  void nick(int fd, std::string nickname);
-  void pass(int fd, std::string password);
-  void pong(int fd);
-  void quit(int fd);
-  void user(int fd, std::vector<std::string> tokens);
-  void userhost(int fd, std::vector<std::string> tokens);
-  void whois(int fd, std::string nickname);
+  int isChannel(std::string channel_name);
+  int isUser(std::string nickname);
 
-  // ----------------------- cmdInChannel -------------------------
+  // =============================================================
+  // ---------------------- channel Mode -------------------------
+
+  void mode(int fd, std::vector<std::string> tokens);
+
+  // -------------------- channel Operator -----------------------
 
   void invite(int fd, std::vector<std::string> tokens);
-  std::string userList(Channel& channel);
+  const std::string userList(const Channel& channel);
   void join(int fd, std::string channel);
   void kick(int fd, std::vector<std::string> tokens);
+  void list(int fd, std::vector<std::string> tokens);
   void part(int fd, std::string channel);
 
   void privateMsg(int fd, std::vector<std::string> tokens);
@@ -106,12 +106,21 @@ class Server {
   void notice(int fd, std::vector<std::string> tokens);
 
   void topic(int fd, std::vector<std::string> tokens);
-  void mode(int fd, std::vector<std::string> tokens);
 
-  // --------------------------------------------------------------
+  // ------------------- connection Message ----------------------
 
-  int isChannel(std::string channel_name);
-  int isUser(std::string nickname);
+  void nick(int fd, std::string nickname);
+  void pass(int fd, std::string password);
+  void pong(int fd);
+  void quit(int fd);
+  void user(int fd, std::vector<std::string> tokens);
+
+  // ------------------- optional Message -----------------------
+
+  void userhost(int fd, std::vector<std::string> tokens);
+  void whois(int fd, std::string target);
+
+  // =============================================================
 };
 
 #endif

@@ -1,5 +1,5 @@
 #include <Server.hpp>
-#include <algorithm> // remove
+#include <algorithm>  // remove
 
 // INVITE user #channel
 
@@ -19,17 +19,21 @@
 // :irc.local 443 root root_ #hi :is already on channel
 
 void Server::invite(int fd, std::vector<std::string> tokens) {
-  std::string user = tokens[1];
-  std::string channel = tokens[2];
-  std::string channelNoHash = channel.substr(1, channel.size() - 1);
+  const std::string user = tokens[1];
+  const std::string channel = tokens[2];
+  const std::string channelNoHash = channel.substr(1, channel.size() - 1);
+
+  const std::string nickname = clients[fd].getNick();
+  const std::string username = clients[fd].getUser();
+  const std::string servername = clients[fd].getServerName();
 
   // channel 인덱스
   int channel_idx = isChannel(channelNoHash);
 
   // invite한 channel이 존재하지 않으면 에러
   if (channel_idx < 0) {
-    std::string se = ":" + SERVER_NAME + " 403 " + clients[fd].getNick() + " " +
-                     channel + " :No such channel\r\n";
+    std::string se = ":" + SERVER_NAME + " 403 " + nickname + " " + channel +
+                     " :No such channel\r\n";
     sendString(se, fd);
     return;
   }
@@ -37,59 +41,63 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
   // invite 받은 user가 서버에 존재하지 않으면 에러
   int target_fd = isUser(user);
   if (target_fd < 0) {
-    std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() + " " +
-                     user + " :No such nick\r\n";
+    std::string se = ":" + SERVER_NAME + " 401 " + nickname + " " + user +
+                     " :No such nick\r\n";
     sendString(se, fd);
     return;
   }
 
   // invite한 user가 채널에 속해있는지 않으면 에러
   if (channels[channel_idx].isUser(fd) < 0) {
-    std::string se = ":" + SERVER_NAME + " 442 " + clients[fd].getNick() + " " +
-                     channel + " :You're not on that channel!\r\n";
+    std::string se = ":" + SERVER_NAME + " 442 " + nickname + " " + channel +
+                     " :You're not on that channel!\r\n";
     sendString(se, fd);
     return;
   }
 
   // invite한 user가 operator가 아니면 에러
   if (channels[channel_idx].isOperator(fd) < 0) {
-    std::string se = ":" + SERVER_NAME + " 482 " + clients[fd].getNick() + " " +
-                     channel + " :You must be a channel operator\r\n";
+    std::string se = ":" + SERVER_NAME + " 482 " + nickname + " " + channel +
+                     " :You must be a channel operator\r\n";
     sendString(se, fd);
     return;
   }
 
   // invite 받은 user가 이미 채널에 속해있으면 에러
   if (channels[channel_idx].isUser(user) >= 0) {
-    std::string se = ":" + SERVER_NAME + " 443 " + clients[fd].getNick() + " " +
-                     user + " " + channel + " :is already on channel\r\n";
+    std::string se = ":" + SERVER_NAME + " 443 " + nickname + " " + user + " " +
+                     channel + " :is already on channel\r\n";
     sendString(se, fd);
     return;
   }
 
   // 모든 조건 만족하면 invite 보내기
+  {
+    // target에게 보내는 메시지
+    std::string se = ":" + nickname + "!" + username + "@" + servername +
+                     " INVITE " + user + " #" + channelNoHash + "\r\n";
+    sendString(se, target_fd);
+  }
 
-  // target에게 보내는 메시지
-  std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
-                   "@" + clients[fd].getServerName() + " INVITE " + user +
-                   " #" + channelNoHash + "\r\n";
-  sendString(se, target_fd);
+  {
+    // invite를 보내는 user에게 보내는 메시지
+    std::string se2 = ":" + SERVER_NAME + " 341 " + nickname + " " + user +
+                      " " + channel + "\r\n";
+    sendString(se2, fd);
+  }
 
-  // invite를 보내는 user에게 보내는 메시지
-  std::string se2 = ":" + SERVER_NAME + " 341 " + clients[fd].getNick() + " " +
-                    user + " " + channel + "\r\n";
-  sendString(se2, fd);
+  {
+    // 채널에 속한 모든 user에게 보내는 메시지
+    //   :irc.local NOTICE #hi :*** root invited root_ into the channel
+    std::string se3 = ":" + nickname + "!" + username + "@" + servername +
+                      " NOTICE " + channel + " :*** " + nickname + " invited " +
+                      user + " into the channel\r\n";
 
-  // 채널에 속한 모든 user에게 보내는 메시지
-  //   :irc.local NOTICE #hi :*** root invited root_ into the channel
-  std::string se3 = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
-                    "@" + clients[fd].getServerName() + " NOTICE " + channel +
-                    " :*** " + clients[fd].getNick() + " invited " + user +
-                    " into the channel\r\n";
+    std::vector<int> users = channels[channel_idx].getUserFds();
+    users.erase(std::remove(users.begin(), users.end(), fd), users.end());
 
-  std::vector<int> users = channels[channel_idx].getUserFds();
-  users.erase(std::remove(users.begin(), users.end(), fd), users.end());
-  sendString(se3, users);
+    sendString(se3, users);
+  }
 }
 
 // no such nick/channel이 window goto 1에 뜨는게 맞는가?
