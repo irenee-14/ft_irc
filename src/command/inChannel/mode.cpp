@@ -68,19 +68,23 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
     // 필요한 인자가 다 있고, operator가 아닐 경우
     // :irc.local 482 root_ #hi :You must have channel op access or above to set
     // channel mode o
-    std::string un = isAddMode ? "" : "un";
-    if (channels[channel_idx].isOperator(fd) < 0 &&
-        (((modeStr[i] == 'o' || modeStr[i] == 'k') && it != modeArgs.end()) ||
-         (isAddMode && modeStr[i] == 'l' && it != modeArgs.end()))) {
-      std::string se = ":" + SERVER_NAME + " 482 " + clients[fd].getNick() +
-                       " " + channel +
-                       " :You must have channel op access or above to " + un +
-                       "set channel mode " + modeStr[i] + "\r\n";
-      sendString(se, fd);
-      continue;
+
+    else if (channels[channel_idx].isOperator(fd) < 0) {
+      std::string un = isAddMode ? "" : "un";
+      if (((modeStr[i] == 'o' || modeStr[i] == 'k') && it == modeArgs.end()) ||
+          (isAddMode && modeStr[i] == 'l' && it == modeArgs.end()))
+        ;
+      else {
+        std::string se = ":" + SERVER_NAME + " 482 " + clients[fd].getNick() +
+                         " " + channel +
+                         " :You must have channel op access or above to " + un +
+                         "set channel mode " + modeStr[i] + "\r\n";
+        sendString(se, fd);
+        continue;
+      }
     }
     // -------------------------------- "o" --------------------------------
-    else if (modeStr[i] == 'o') {
+    if (modeStr[i] == 'o') {
       // *it에 값 없을 경우
       if (it == modeArgs.end()) {
         std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
@@ -97,6 +101,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
         // :irc.local 401 root nick :No such nick
         std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() +
                          " " + *it + " :No such nick\r\n";
+        sendString(se, fd);
         it++;
         continue;
       }
