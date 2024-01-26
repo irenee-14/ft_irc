@@ -13,11 +13,9 @@ void Server::nick(int fd, std::string nickname) {
   }
 
   // nickname 설정
-  clients[fd].setNick(nickname);
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " NICK :" + nickname +
                    "\r\n";
-  // clients[fd].setNick(nickname);
-  // ??????????? setnick 왜 두개있지 어디서 해야하지
+  clients[fd].setNick(nickname);
   sendString(se, fd);
 }
