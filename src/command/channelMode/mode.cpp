@@ -1,6 +1,17 @@
+#include <cstdlib>  // atoi
 #include <sstream>  // l : stringstream
 
 #include "Server.hpp"
+
+const std::string ERR_INVALIDMODEPARAM(const std::string nickname,
+                                       const std::string channel,
+                                       const char mode,
+                                       const std::string rawMode) {
+  return (":" + SERVER_NAME + " 696 " + nickname + " " + channel + " " + mode +
+          " * :You must specify a parameter for the " + rawMode +
+          " mode. Syntax: <nick>.\r\n");
+}
+
 std::string makeModeReply(const Client client, std::string channel,
                           std::vector<t_mode> modes) {
   std::string se = ":" + client.getNick() + "!" + client.getUser() + "@" +
@@ -32,8 +43,11 @@ std::string makeModeReply(const Client client, std::string channel,
 // !!!!!!!!!!!!!setMode 해두기
 
 void Server::mode(int fd, std::vector<std::string> tokens) {
-  std::string channel = tokens[1];
-  std::string channelNoHash = channel.substr(1, channel.size() - 1);
+  const std::string nickname = clients[fd].getNick();
+
+  const std::string channel = tokens[1];
+  const std::string channelNoHash = channel.substr(1, channel.size() - 1);
+
   int channel_idx = isChannel(channelNoHash);
   bool isAddMode = true;
 
@@ -54,14 +68,12 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
   std::vector<t_mode> modes;  // 모드 정보를 담는 vector, 모드 정보는
                               // isAddMode, option, arg로 구성됨
 
-  std::string ret_mode;
-  std::string ret_str;
-
   for (unsigned int i = 0; i < modeStr.size(); ++i) {
+    const char mode = modeStr[i];
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if (modeStr[i] == '+')
+    if (mode == '+')
       isAddMode = true;
-    else if (modeStr[i] == '-')
+    else if (mode == '-')
       isAddMode = false;
     // ----------------------------------------------------------------------
     // isOperator
@@ -71,27 +83,27 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
 
     else if (channels[channel_idx].isOperator(fd) < 0) {
       std::string un = isAddMode ? "" : "un";
-      if (((modeStr[i] == 'o' || modeStr[i] == 'k') && it == modeArgs.end()) ||
-          (isAddMode && modeStr[i] == 'l' && it == modeArgs.end()))
+      if (((mode == 'o' || mode == 'k') && it == modeArgs.end()) ||
+          (isAddMode && mode == 'l' && it == modeArgs.end()))
         ;
       else {
-        std::string se = ":" + SERVER_NAME + " 482 " + clients[fd].getNick() +
-                         " " + channel +
+        std::string se = ":" + SERVER_NAME + " 482 " + nickname + " " +
+                         channel +
                          " :You must have channel op access or above to " + un +
-                         "set channel mode " + modeStr[i] + "\r\n";
+                         "set channel mode " + mode + "\r\n";
         sendString(se, fd);
         continue;
       }
     }
     // -------------------------------- "o" --------------------------------
-    if (modeStr[i] == 'o') {
+    if (mode == 'o') {
       // *it에 값 없을 경우
       if (it == modeArgs.end()) {
-        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
-                         " " + channel +
-                         " o * :You must specify a parameter for the op mode. "
-                         "Syntax: <nick>.\r\n";
-        sendString(se, fd);
+        // std::string se = ":" + SERVER_NAME + " 696 " + nickname + " " +
+        //                  channel + " " + mode +
+        //                  " * :You must specify a parameter for the " + op +
+        //                  " mode. Syntax: <nick>.\r\n";
+        sendString(ERR_INVALIDMODEPARAM(nickname, channel, mode, "op"), fd);
         continue;
       }
       // server에 user가 존재하는지 확인
@@ -99,8 +111,8 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       if (user_fd < 0) {
         // 401 ERR_NOSUCHNICK
         // :irc.local 401 root nick :No such nick
-        std::string se = ":" + SERVER_NAME + " 401 " + clients[fd].getNick() +
-                         " " + *it + " :No such nick\r\n";
+        std::string se = ":" + SERVER_NAME + " 401 " + nickname + " " + *it +
+                         " :No such nick\r\n";
         sendString(se, fd);
         it++;
         continue;
@@ -119,22 +131,22 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
         channels[channel_idx].addOperator(user_fd);
       else
         channels[channel_idx].removeOperator(user_fd);
-      modes.push_back(t_mode(isAddMode, 'o', *it));
+      modes.push_back(t_mode(isAddMode, mode, *it));
       it++;
     }
     // -------------------------------- "k" --------------------------------
     // MODE +k [key]
-    else if (modeStr[i] == 'k') {
+    else if (mode == 'k') {
       // *it에 값 없을 경우
       // :irc.local 696 root #hi k * :You must specify a parameter for the
       // key mode. Syntax: <key>.
 
       if (it == modeArgs.end()) {
-        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
-                         " " + channel +
-                         " k * :You must specify a parameter for the key "
-                         "mode. Syntax: <key>.\r\n";
-        sendString(se, fd);
+        // std::string se = ":" + SERVER_NAME + " 696 " + nickname + " " +
+        //                  channel + " " + mode +
+        //                  " * :You must specify a parameter for the " + key +
+        //                  " mode. Syntax: <key>.\r\n";
+        sendString(ERR_INVALIDMODEPARAM(nickname, channel, mode, "key"), fd);
         continue;
       }
       // channel에 key가 이미 존재하는지 확인
@@ -152,21 +164,21 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
         continue;
       }
 
-      modes.push_back(t_mode(isAddMode, 'k', *it));
+      modes.push_back(t_mode(isAddMode, mode, *it));
       it++;
     }
     // -------------------------------- "l" --------------------------------
-    else if (modeStr[i] == 'l') {
+    else if (mode == 'l') {
       //*it에 값 없을 경우
       // :irc.local 696 root #hi l * :You must specify a parameter for the limit
       // mode. Syntax: <limit>.
 
       if (isAddMode && it == modeArgs.end()) {
-        std::string se = ":" + SERVER_NAME + " 696 " + clients[fd].getNick() +
-                         " " + channel +
-                         " l * :You must specify a parameter for the limit "
-                         "mode. Syntax: <limit>.\r\n";
-        sendString(se, fd);
+        // std::string se = ":" + SERVER_NAME + " 696 " + nickname + " " +
+        //                  channel + " " + mode +
+        //                  " * :You must specify a parameter for the " + limit
+        //                  + " mode. Syntax: <limit>.\r\n";
+        sendString(ERR_INVALIDMODEPARAM(nickname, channel, mode, "limit"), fd);
         continue;
       }
 
@@ -174,19 +186,17 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       if (isAddMode) {
         int retLimit = std::atoi((*it).c_str());
         channels[channel_idx].setLimit(retLimit);
-        std::stringstream ss;
-        ss << retLimit;
 
-        modes.push_back(t_mode(isAddMode, 'l', ss.str()));
+        modes.push_back(t_mode(isAddMode, mode, intToString(retLimit)));
         it++;
       } else if (channels[channel_idx].getLimit() != -1) {
         channels[channel_idx].setLimit(-1);
-        modes.push_back(t_mode(isAddMode, 'l', ""));
+        modes.push_back(t_mode(isAddMode, mode, ""));
       }
     }
 
     // -------------------------------- "i" --------------------------------
-    else if (modeStr[i] == 'i') {
+    else if (mode == 'i') {
       // if ((isAddMode && channels[channel_idx].isInviteOnly()) ||
       //     (!isAddMode && !channels[channel_idx].isInviteOnly())) {
       //   continue;
@@ -198,7 +208,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       // modes.push_back(t_mode(isAddMode, 'i', ""));
     }
     // -------------------------------- "t" --------------------------------
-    else if (modeStr[i] == 't') {
+    else if (mode == 't') {
       // if ((isAddMode && channels[channel_idx].isTopic()) ||
       //     (!isAddMode && !channels[channel_idx].isTopic())) {
       //   continue;
@@ -209,9 +219,10 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
       //   channels[channel_idx].setTopic(false);
       // modes.push_back(t_mode(isAddMode, 't', ""));
     } else
-      // 없는 모드일 경우 에러 처리
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ;
+    // 없는 모드일 경우 에러 처리
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    {
+    }
     // parsing
     // o, i, t, k, l 일 경우 +, - 따라서 함수 실행
     // std::map<char, std::string> option_map;

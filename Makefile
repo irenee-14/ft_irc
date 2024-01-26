@@ -33,34 +33,44 @@ SRCS_FILES		=	main.cpp \
 					Utils.cpp
 SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 
-CMD_DIR			=	./src/command/cmd
-CMD_FILES		=	list.cpp \
-					nick.cpp \
-					pass.cpp \
-					pong.cpp \
-					quit.cpp \
-					user.cpp \
-					userhost.cpp \
-					whois.cpp
-CMD				=	$(addprefix $(CMD_DIR)/, $(CMD_FILES))
 
-CHANNEL_DIR		=	./src/command/inChannel
+MODE_DIR		=	./src/command/channelMode
+MODE_FILES		=	mode.cpp
+MODE			=	$(addprefix $(MODE_DIR)/, $(MODE_FILES))
+
+CHANNEL_DIR		=	./src/command/channelOper
 CHANNEL_FILES	=	invite.cpp \
 					join.cpp \
 					kick.cpp \
+					list.cpp \
 					part.cpp \
 					privMsg.cpp \
-					topic.cpp \
-					mode.cpp
-					
+					topic.cpp
 CHANNEL			=	$(addprefix $(CHANNEL_DIR)/, $(CHANNEL_FILES))
+
+
+CONNECT_DIR		=	./src/command/connectionMsg
+CONNECT_FILES	=	nick.cpp \
+					pass.cpp \
+					pong.cpp \
+					quit.cpp \
+					user.cpp
+CONNECT			=	$(addprefix $(CONNECT_DIR)/, $(CONNECT_FILES))
+
+OPTION_DIR		=	./src/command/optionalMsg
+OPTION_FILES	=	userhost.cpp \
+					whois.cpp
+OPTION			=	$(addprefix $(OPTION_DIR)/, $(OPTION_FILES))
+
 
 # ---------------------------------------------------------------------
 
 OBJS_DIR		=	./objs
 OBJS			=	$(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o) \
-					$(CMD:$(CMD_DIR)/%.cpp=$(OBJS_DIR)/%.o) \
-					$(CHANNEL:$(CHANNEL_DIR)/%.cpp=$(OBJS_DIR)/%.o)
+					$(MODE:$(MODE_DIR)/%.cpp=$(OBJS_DIR)/%.o) \
+					$(CHANNEL:$(CHANNEL_DIR)/%.cpp=$(OBJS_DIR)/%.o) \
+					$(CONNECT:$(CONNECT_DIR)/%.cpp=$(OBJS_DIR)/%.o) \
+					$(OPTION:$(OPTION_DIR)/%.cpp=$(OBJS_DIR)/%.o)
 
 # ---------------------------------------------------------------------
 
@@ -74,11 +84,20 @@ $(OBJS_DIR)/%.o	:	$(SRCS_DIR)/%.cpp
 					@echo $(GRAY) "ircserv Compiling... " $< $(EOC) $(LINE_DEL)
 					@$(CXX) $(CXXFLAGS) -I $(HEADER) -c $< -o $@
 
-$(OBJS_DIR)/%.o	:	$(CMD_DIR)/%.cpp
+$(OBJS_DIR)/%.o	:	$(MODE_DIR)/%.cpp
 					@echo $(GRAY) "ircserv Compiling... " $< $(EOC) $(LINE_DEL)
 					@$(CXX) $(CXXFLAGS) -I $(HEADER) -c $< -o $@
 
 $(OBJS_DIR)/%.o	:	$(CHANNEL_DIR)/%.cpp
+					@echo $(GRAY) "ircserv Compiling... " $< $(EOC) $(LINE_DEL)
+					@$(CXX) $(CXXFLAGS) -I $(HEADER) -c $< -o $@
+
+$(OBJS_DIR)/%.o	:	$(CONNECT_DIR)/%.cpp
+					@echo $(GRAY) "ircserv Compiling... " $< $(EOC) $(LINE_DEL)
+					@$(CXX) $(CXXFLAGS) -I $(HEADER) -c $< -o $@
+
+
+$(OBJS_DIR)/%.o	:	$(OPTION_DIR)/%.cpp
 					@echo $(GRAY) "ircserv Compiling... " $< $(EOC) $(LINE_DEL)
 					@$(CXX) $(CXXFLAGS) -I $(HEADER) -c $< -o $@
 

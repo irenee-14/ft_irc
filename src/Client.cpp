@@ -39,7 +39,7 @@ void Client::setServerName(const std::string server_name) {
   _server_name = server_name;
 }
 
-void Client::setTimestamp(const u_int32_t timestamp) { _timestamp = timestamp; }
+void Client::setTimestamp(const time_t timestamp) { _timestamp = timestamp; }
 void Client::setPassFlag(const bool flag) { _pass_flag = flag; }
 void Client::setNickFlag(const bool flag) { _nick_flag = flag; }
 
@@ -48,6 +48,6 @@ std::string Client::getNick(void) const { return (_nick); }
 std::string Client::getUser(void) const { return (_user); }
 std::string Client::getRealName(void) const { return (_real_name); }
 std::string Client::getServerName(void) const { return (_server_name); }
-u_int32_t Client::getTimestamp(void) const { return (_timestamp); }
+time_t Client::getTimestamp(void) const { return (_timestamp); }
 bool Client::getPassFlag(void) const { return (_pass_flag); }
 bool Client::getNickFlag(void) const { return (_nick_flag); }

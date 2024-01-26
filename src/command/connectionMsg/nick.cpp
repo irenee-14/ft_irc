@@ -8,17 +8,14 @@ void Server::nick(int fd, std::string nickname) {
   if (nick_idx >= 0) {
     std::string se = ":" + SERVER_NAME + " 433 * " + nickname +
                      " :Nickname is already in use.\r\n";
-
     sendString(se, fd);
     return;
   }
 
   // nickname 설정
-  clients[fd].setNick(nickname);
   std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
                    "@" + clients[fd].getServerName() + " NICK :" + nickname +
                    "\r\n";
-
   clients[fd].setNick(nickname);
   sendString(se, fd);
 }

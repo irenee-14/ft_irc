@@ -5,9 +5,11 @@
 #include <sys/socket.h>
 #include <unistd.h>  // close
 
+#include <cstdlib>  // atoi
+
 #define BUF_SIZE 512
 
-// *****************************
+// ===============================================================
 
 Server::Server(void) {}
 
@@ -21,7 +23,7 @@ Server::Server(char** argv) {
   memset(&serv_adr, 0, sizeof(this->serv_adr));
   this->serv_adr.sin_family = AF_INET;
   this->serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
-  this->serv_adr.sin_port = htons(atoi(argv[1]));
+  this->serv_adr.sin_port = htons(std::atoi(argv[1]));
 
   int flag = 1;
   if (setsockopt(this->serv_fd, SOL_SOCKET, SO_REUSEADDR, &flag,
@@ -59,7 +61,7 @@ Server& Server::operator=(Server const& rhs) {
   return (*this);
 }
 
-// ---------------------------------------------------------------
+// ===============================================================
 
 void Server::initializeCommandList() {
   if (command_list.empty()) {
@@ -80,6 +82,7 @@ void Server::initializeCommandList() {
     command_list["QUIT"] = 15;
   }
 }
+
 // ---------------------------------------------------------------
 
 int Server::getServFd() const { return (this->serv_fd); }

@@ -4,20 +4,20 @@ void Server::part(int fd, std::string channel) {
   // 채널 나가는데 마지막이면 채널 없애기
   if (channels.size() < 1) return;
 
-  std::string channelNoHash = channel.substr(1, channel.size() - 1);
+  const std::string channelNoHash = channel.substr(1, channel.size() - 1);
+  const std::string nickname = clients[fd].getNick();
+  const std::string username = clients[fd].getUser();
 
   int channel_idx = isChannel(channelNoHash);
 
   if (channel[0] != '#' || channel_idx < 0) {
-    std::string se = ":" + SERVER_NAME + " 403 " + clients[fd].getNick() + " " +
-                     channel + " :No such channel\r\n";
+    std::string se = ":" + SERVER_NAME + " 403 " + nickname + " " + channel +
+                     " :No such channel\r\n";
     sendString(se, fd);
-
     return;
   } else {
-    std::string se = ":" + clients[fd].getNick() + "!" + clients[fd].getUser() +
-                     " PART :" + channel + "\r\n";
-
+    std::string se =
+        ":" + nickname + "!" + username + " PART :" + channel + "\r\n";
     sendString(se, channels[channel_idx].getUserFds());
 
     // users에서 지우기
