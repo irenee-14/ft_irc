@@ -12,15 +12,22 @@ class Channel {
   std::string _channel_name;
   std::vector<int> _user_fds;
   std::vector<std::string> _user_nicks;
+  time_t _timestamp;
+
+  std::vector<int> _operator;
   // -------------------------------------------------------------
+
   int _mode[5];
 
-  std::string _topic;
   std::string _key;
   int _limit;
-  // -------------------------------------------------------------
-  std::vector<int> _operator;
+
+  bool _isTopicMode;
+  std::string _topic;
+
+  bool _isInviteOnlyMode;
   std::vector<int> _invite_list;
+
   // -------------------------------------------------------------
 
   Channel(void);
@@ -36,28 +43,37 @@ class Channel {
   std::string getChannelName() const;
   std::vector<int> getUserFds() const;
   std::vector<std::string> getUserNicks() const;
+  time_t getTimestamp(void) const;
 
-  int getMode(int index) const;
+  std::vector<int> getOperators() const;
+
+  // ----------------------------------------------------
+
   std::string getModes(void);
 
-  std::string getTopic() const;
   std::string getKey() const;
   int getLimit() const;
 
-  std::vector<int> getOperators() const;
+  bool getTopicMode() const;
+  std::string getTopic() const;
+
+  bool getInviteOnlyMode() const;
   std::vector<int> getInviteList() const;
 
   // ----------------------------------------------------
 
   void setChannelName(std::string channel_name);
+  void setOperator(std::vector<int> op);
 
-  void setMode(int index, int mode);
+  void setMode(char mode, int isAddMode);
 
-  void setTopic(std::string topic);
   void setKey(std::string key);
   void setLimit(int limit);
 
-  void setOperator(std::vector<int> op);
+  void setTopicMode(bool isTopicMode);
+  void setTopic(std::string topic);
+
+  void setInviteOnlyMode(bool isInviteOnlyMode);
   void setInviteList(std::vector<int> invite_list);
 
   // ----------------------------------------------------
