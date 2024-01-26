@@ -12,7 +12,7 @@ Channel::Channel(std::string channel_name)
       _timestamp(time(0)),
       _key(""),
       _limit(-1),
-      _isTopicMode(false),
+      _isTopicMode(true),
       _topic(""),
       _isInviteOnlyMode(false) {
   _mode[t] = 1;
