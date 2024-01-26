@@ -49,7 +49,7 @@ class Channel {
 
   // ----------------------------------------------------
 
-  std::string getModes(void);
+  std::string getModes(int fd) const;
 
   std::string getKey() const;
   int getLimit() const;
@@ -93,14 +93,19 @@ class Channel {
   //    }
   //  }
 
+  int isUser(int fd) const;
+  int isUser(std::string nickname) const;
   // ----------------------------------------------------
+
   void addOperator(int user);
   void removeOperator(int user);
+  int isOperator(int fd) const;
 
   // ----------------------------------------------------
-  int isUser(int fd);
-  int isUser(std::string nickname);
-  int isOperator(int fd);
+
+  void addInvite(int user);
+  void removeInvite(int user);
+  int isInvite(int fd) const;
 };
 
 #endif

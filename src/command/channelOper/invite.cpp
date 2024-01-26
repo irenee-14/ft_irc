@@ -73,6 +73,8 @@ void Server::invite(int fd, std::vector<std::string> tokens) {
 
   // 모든 조건 만족하면 invite 보내기
   {
+    // invite list에 추가
+    channels[channel_idx].addInvite(target_fd);
     // target에게 보내는 메시지
     std::string se = ":" + nickname + "!" + username + "@" + servername +
                      " INVITE " + user + " #" + channelNoHash + "\r\n";

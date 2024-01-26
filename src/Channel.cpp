@@ -8,14 +8,17 @@
 Channel::Channel(void) {}
 
 Channel::Channel(std::string channel_name)
-    : _channel_name(channel_name), _timestamp(time(0)) {
+    : _channel_name(channel_name),
+      _timestamp(time(0)),
+      _key(""),
+      _limit(-1),
+      _isTopicMode(false),
+      _topic(""),
+      _isInviteOnlyMode(false) {
   _mode[t] = 1;
   _mode[i] = 0;
   _mode[k] = 0;
   _mode[l] = 0;
-  _topic = "";
-  _key = "";
-  _limit = -1;
 }
 
 Channel::Channel(const Channel& src) { *this = src; }
@@ -61,14 +64,19 @@ time_t Channel::getTimestamp(void) const { return (this->_timestamp); }
 
 // ----------------------------------------------------------------------------
 
-std::string Channel::getModes(void) {
+std::string Channel::getModes(int fd) const {
   std::string modes = "";
   if (this->_mode[i]) modes += "i";
   if (this->_mode[k]) modes += "k";
   if (this->_mode[l]) modes += "l";
   if (this->_mode[t]) modes += "t";
-
-  if (this->_key != "") modes += " " + this->_key;
+  // 채널에 속해있는 사람에게만 key 보임
+  if (this->_key != "") {
+    if (this->isUser(fd) != -1)
+      modes += " " + this->_key;
+    else
+      modes += " <key>";
+  }
   if (this->_limit != -1) modes += " " + intToString(this->_limit);
 
   return (modes);
@@ -173,6 +181,22 @@ void Channel::removeUser(std::string find) {
   }
 }
 
+// ================================= is user ===================================
+
+int Channel::isUser(int fd) const {
+  for (unsigned int i = 0; i < this->_user_fds.size(); i++) {
+    if (this->_user_fds[i] == fd) return (i);
+  }
+  return (-1);
+}
+
+int Channel::isUser(std::string nickname) const {
+  for (unsigned int i = 0; i < this->_user_nicks.size(); i++) {
+    if (this->_user_nicks[i] == nickname) return (i);
+  }
+  return (-1);
+}
+
 // =============================== Operator =================================
 void Channel::addOperator(int user) { this->_operator.push_back(user); }
 
@@ -182,29 +206,32 @@ void Channel::removeOperator(int user) {
   if (it != this->_operator.end()) this->_operator.erase(it);
 }
 
-// ================================= is =====================================
-
-int Channel::isUser(int fd) {
-  for (unsigned int i = 0; i < this->_user_fds.size(); i++) {
-    if (this->_user_fds[i] == fd) return (i);
-  }
-  return (-1);
-}
-
-int Channel::isUser(std::string nickname) {
-  for (unsigned int i = 0; i < this->_user_nicks.size(); i++) {
-    if (this->_user_nicks[i] == nickname) return (i);
-  }
-  return (-1);
-}
-
 // isOperator
 // 인자로 어느 채널인지 받아서 그 채널의 operator인지 확인
 // operator이면 true, 아니면 false
 
-int Channel::isOperator(int fd) {
+int Channel::isOperator(int fd) const {
   for (unsigned int i = 0; i < this->_operator.size(); i++) {
     if (this->_operator[i] == fd) return (i);
+  }
+  return (-1);
+}
+
+// =============================== invite ====================================
+
+void Channel::addInvite(int user) {
+  if (this->isInvite(user) == -1) this->_invite_list.push_back(user);
+}
+
+void Channel::removeInvite(int user) {
+  std::vector<int>::iterator it =
+      std::find(this->_invite_list.begin(), this->_invite_list.end(), user);
+  if (it != this->_invite_list.end()) this->_invite_list.erase(it);
+}
+
+int Channel::isInvite(int fd) const {
+  for (unsigned int i = 0; i < this->_invite_list.size(); i++) {
+    if (this->_invite_list[i] == fd) return (i);
   }
   return (-1);
 }
