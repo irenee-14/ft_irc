@@ -58,7 +58,7 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
   // :irc.local 329 root #hi :1706258904
   if (tokens.size() < 3) {
     std::string se = ":" + SERVER_NAME + " 324 " + nickname + " " + channel +
-                     " +" + channels[channel_idx].getModes() + "\r\n";
+                     " +" + channels[channel_idx].getModes(fd) + "\r\n";
     sendString(se, fd);
 
     std::string se2 = ":" + SERVER_NAME + " 329 " + nickname + " " + channel +
