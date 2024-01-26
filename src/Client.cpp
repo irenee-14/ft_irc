@@ -31,6 +31,17 @@ Client& Client::operator=(Client const& rhs) {
   return (*this);
 }
 
+// ===============================================================
+int Client::getFd(void) const { return (_clnt_fd); }
+std::string Client::getNick(void) const { return (_nick); }
+std::string Client::getUser(void) const { return (_user); }
+std::string Client::getRealName(void) const { return (_real_name); }
+std::string Client::getServerName(void) const { return (_server_name); }
+time_t Client::getTimestamp(void) const { return (_timestamp); }
+bool Client::getPassFlag(void) const { return (_pass_flag); }
+bool Client::getNickFlag(void) const { return (_nick_flag); }
+
+// ---------------------------------------------------------------
 void Client::setFd(const int fd) { _clnt_fd = fd; }
 void Client::setNick(const std::string nick) { _nick = nick; }
 void Client::setUser(const std::string user) { _user = user; }
@@ -42,12 +53,3 @@ void Client::setServerName(const std::string server_name) {
 void Client::setTimestamp(const time_t timestamp) { _timestamp = timestamp; }
 void Client::setPassFlag(const bool flag) { _pass_flag = flag; }
 void Client::setNickFlag(const bool flag) { _nick_flag = flag; }
-
-int Client::getFd(void) const { return (_clnt_fd); }
-std::string Client::getNick(void) const { return (_nick); }
-std::string Client::getUser(void) const { return (_user); }
-std::string Client::getRealName(void) const { return (_real_name); }
-std::string Client::getServerName(void) const { return (_server_name); }
-time_t Client::getTimestamp(void) const { return (_timestamp); }
-bool Client::getPassFlag(void) const { return (_pass_flag); }
-bool Client::getNickFlag(void) const { return (_nick_flag); }
