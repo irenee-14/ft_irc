@@ -53,7 +53,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
       whois(fd, tokens[1]);
       break;
     case JOIN:
-      join(fd, tokens[1]);
+      join(fd, tokens);
       break;
     case PART:
       part(fd, tokens[1]);

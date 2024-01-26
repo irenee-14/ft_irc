@@ -96,7 +96,7 @@ class Server {
 
   void invite(int fd, std::vector<std::string> tokens);
   const std::string userList(const Channel& channel);
-  void join(int fd, std::string channel);
+  void join(int fd, std::vector<std::string> tokens);
   void kick(int fd, std::vector<std::string> tokens);
   void list(int fd, std::vector<std::string> tokens);
   void part(int fd, std::string channel);
