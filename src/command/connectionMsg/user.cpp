@@ -10,5 +10,5 @@ void Server::user(int fd, std::vector<std::string> tokens) {
   printArg(" user name   : ", clients[fd].getUser());
   printArg(" server name : ", clients[fd].getServerName());
   printArg(" real name   : ", clients[fd].getRealName());
-  printArg("--------------------------\n", 0);
+  printArg("--------------------------\n", "");
 }

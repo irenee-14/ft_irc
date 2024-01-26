@@ -27,6 +27,17 @@ class Client {
 
   // ----------------------------------------------------
 
+  int getFd(void) const;
+  std::string getNick(void) const;
+  std::string getUser(void) const;
+  std::string getRealName(void) const;
+  std::string getServerName(void) const;
+  time_t getTimestamp(void) const;
+  bool getPassFlag(void) const;
+  bool getNickFlag(void) const;
+
+  // ----------------------------------------------------
+
   void setFd(const int fd);
   void setNick(const std::string nick);
   void setUser(const std::string user);
@@ -36,17 +47,6 @@ class Client {
   void setTimestamp(const time_t timestamp);
   void setPassFlag(const bool flag);
   void setNickFlag(const bool flag);
-
-  // ----------------------------------------------------
-
-  int getFd(void) const;
-  std::string getNick(void) const;
-  std::string getUser(void) const;
-  std::string getRealName(void) const;
-  std::string getServerName(void) const;
-  time_t getTimestamp(void) const;
-  bool getPassFlag(void) const;
-  bool getNickFlag(void) const;
 };
 
 #endif

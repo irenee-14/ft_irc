@@ -6,7 +6,7 @@
 - [X] USER : 사용자 정보 설정
 - [X] USERHOST : 사용자의 호스트 정보 확인
 - [X] JOIN : 채널 입장
-	- [ ] key, invite only mode, limit 확인하고 입장
+	- [X] key, invite only mode, limit 확인하고 입장
 - [X] PART : 채널 나가기
 - [X] PRIVMSG : 특정 사용자 또는 채널에 메시지를 보내기
 
@@ -15,8 +15,8 @@
 - [X] INVITE : 특정 채널로 유저 초대
 - [△] TOPIC : 특정 채널의 주제 설정
     - MODE가 +t 일때 관리자만 변경 가능
-- [ ] MODE : 채널의 모드 설정
-    - [ ] i : 초대 전용 채널 설정/제거
+- [X] MODE : 채널의 모드 설정
+    - [X] i : 초대 전용 채널 설정/제거
     - [ ] t : 운영자가 아닌 일반 유저에 대한 TOPIC 명령 제한 설정/제거
       - +t : TOPIC 설정 불가
     - [X] k (password): 채널키(비밀번호) 설정/제거

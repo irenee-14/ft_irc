@@ -1,10 +1,10 @@
 #include "Server.hpp"
 
-const std::string RPL_LIST(const std::string nickname, Channel channel) {
+const std::string RPL_LIST(const std::string nickname, Channel channel,
+                           std::string modes) {
   return (":" + SERVER_NAME + " 322 " + nickname + " #" +
           channel.getChannelName() + " " +
-          intToString(channel.getUserFds().size()) + " :[+" +
-          channel.getModes() + "]\r\n");
+          intToString(channel.getUserFds().size()) + " :[+" + modes + "]\r\n");
 }
 
 // -----------------------------------------------------------
@@ -27,13 +27,14 @@ void Server::list(int fd, std::vector<std::string> tokens) {
 
       int channel_idx = isChannel(channelNoHash);
       if (channel_idx >= 0) {
-        se += RPL_LIST(nickname, channels[channel_idx]);
+        se += RPL_LIST(nickname, channels[channel_idx],
+                       channels[channel_idx].getModes(fd));
       }
     }
     // LIST : 모든 채널 정보 출력
     else {
       for (unsigned int i = 0; i < size; ++i) {
-        se += RPL_LIST(nickname, channels[i]);
+        se += RPL_LIST(nickname, channels[i], channels[i].getModes(fd));
       }
     }
   }

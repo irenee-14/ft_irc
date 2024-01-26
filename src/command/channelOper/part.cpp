@@ -1,9 +1,8 @@
 #include "Server.hpp"
 
 void Server::part(int fd, std::string channel) {
-  // 채널 나가는데 마지막이면 채널 없애기
+  // 채널 아무것도 없으면 무시
   if (channels.size() < 1) return;
-
   const std::string channelNoHash = channel.substr(1, channel.size() - 1);
   const std::string nickname = clients[fd].getNick();
   const std::string username = clients[fd].getUser();

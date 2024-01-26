@@ -113,7 +113,7 @@ void Server::acceptLoop() {
 
         // 클라이언트 새로 생성 후 fd 할당
         clients[clnt_sock] = Client(clnt_sock);
-        printArg("\n===============================================\n", 0);
+        printArg("\n===============================================\n", "");
         printArg("connected client: ", clnt_sock);
       }
       continue;
@@ -144,7 +144,7 @@ void Server::acceptLoop() {
         {
           write(1, buf, str_len);
 
-          printArg("\n-----------------------------------------------\n", 0);
+          printArg("\n-----------------------------------------------\n", "");
           try {
             checkCommand(fds[i], buf);
             memset(buf, 0, BUF_SIZE);
@@ -158,7 +158,7 @@ void Server::acceptLoop() {
             fds.erase(fds.begin() + i);
             printArg("closed client: ", fds[i].fd);
           }
-          printArg("\n===============================================\n", 0);
+          printArg("\n===============================================\n", "");
         }
       }
     }

@@ -25,7 +25,9 @@ const std::string Server::userList(const Channel& channel) {
 
 // -------------------------------------------------------------
 
-void Server::join(int fd, std::string channel) {
+void Server::join(int fd, std::vector<std::string> tokens) {
+  const std::string channel = tokens[1];
+  const std::string password = tokens.size() > 2 ? tokens[2] : "";
   const std::string channelNoHash = channel.substr(1, channel.size() - 1);
 
   const std::string nickname = clients[fd].getNick();
@@ -34,6 +36,36 @@ void Server::join(int fd, std::string channel) {
 
   int channel_idx = isChannel(channelNoHash);
   if (channel_idx >= 0) {
+    // invited 확인
+    if (channels[channel_idx].isInvite(fd) < 0) {
+      // password mode 확인
+      if (channels[channel_idx].getKey() != password) {
+        const std::string se =
+            ":" + SERVER_NAME + " 475 " + nickname + " " + channel +
+            " :Cannot join channel (incorrect channel key)\r\n";
+        sendString(se, fd);
+        return;
+      };
+      // invite mode 확인
+      if (channels[channel_idx].getInviteOnlyMode()) {
+        const std::string se = ":" + SERVER_NAME + " 473 " + nickname + " " +
+                               channel +
+                               " :Cannot join channel (invite only)\r\n";
+        sendString(se, fd);
+        return;
+      };
+      // limit 확인
+      if (channels[channel_idx].getLimit() > 0 &&
+          channels[channel_idx].getUserFds().size() >=
+              (unsigned int)channels[channel_idx].getLimit()) {
+        const std::string se = ":" + SERVER_NAME + " 471 " + nickname + " " +
+                               channel +
+                               " :Cannot join channel (channel is full)\r\n";
+        sendString(se, fd);
+        return;
+      };
+    } else
+      channels[channel_idx].removeInvite(fd);
     channels[channel_idx].addUser(fd, nickname);
   } else {
     channel_idx = channels.size();
@@ -45,13 +77,29 @@ void Server::join(int fd, std::string channel) {
 
   {
     // 채널에 속한 모든 user에게 join 메시지 보내기
+    // :root_!root@127.0.0.1 JOIN :#hi
     std::string se = ":" + nickname + "!" + username + "@" + servername +
                      " JOIN :" + channel + "\r\n";
     sendString(se, channels[channel_idx].getUserFds());
   }
 
+  // 채널 입장시 보내는 메시지
+  {
+    // topic 있을 때
+    // :irc.local 332 root_ #hi :asdf
+    // :irc.local 333 root_ #hi root!root@127.0.0.1 :1706264746
+    std::string topic = channels[channel_idx].getTopic();
+    if (topic != "") {
+      std::string se = ":" + SERVER_NAME + " 332 " + nickname + " " + channel +
+                       " :" + topic + "\r\n";
+      sendString(se, fd);
+    }
+  }
+
   {
     // 채널에 들어온 user에게 채널 정보 보내기
+    // :irc.local 353 root_ = #hi :@root root_
+    // :irc.local 366 root_ #hi :End of /NAMES list.
     std::string se2 = ":" + SERVER_NAME + " 353 " + nickname + " = " + channel +
                       " :" + userList(channels[channel_idx]) + "\r\n";
 

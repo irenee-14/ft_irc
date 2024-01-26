@@ -22,6 +22,11 @@ void Server::quit(int fd) {
                          " QUIT :leaving\r\n";
         sendString(se, channels[i].getUserFds());
       }
+
+      // users에서 빠지면서 채널에 아무도 없으면 채널 없애기
+      if (channels[i].getUserFds().empty()) {
+        channels.erase(channels.begin() + i);
+      }
     }
   }
   // server에 quit 메시지 보내기
