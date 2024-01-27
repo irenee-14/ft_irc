@@ -36,3 +36,42 @@
 - [X] LIST : 현재 서버에서 사용 가능한 채널 목록을 조회
     - [X] : LIST -yes : 전체 채널 목록 조회
     - [X] : LIST #channel : 특정 채널 정보 조회(#필수)
+
+
+# command 분류
+## Connection Message
+- nick
+- pass
+- pong
+- quit
+- user
+
+## Channel Operator
+- invite
+- join
+- kick
+- list
+- part
+- privMsg
+- topic
+- mode
+
+## Optional Message
+- userhost
+- whois
+
+## 체크리스트
+- user 존재 여부
+- user의 채널에 속해있는지 여부
+- user가 채널의 처음인지/마지막인지
+  - channel이 존재하는지
+  - 마지막 user인지
+- user가 operator인지
+
+- target의 존재 여부(client/channel)
+- target이 채널에 속해있는지 여부
+- target이
+
+- 필요한 인자가 모두 들어왔는지
+- 별도로 설정되어 있는 모드가 있는지
+- 추가/삭제가 올바르게 이루어지는지

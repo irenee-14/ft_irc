@@ -82,6 +82,23 @@ std::string Channel::getModes(int fd) const {
   return (modes);
 }
 
+// 현재 채널 모드 정보 출력
+// :irc.local 324 root #hi +lnt :3
+// :irc.local 329 root #hi :1706258904
+void Channel::printCurMode(int fd, std::string server_name,
+                           std::string nickname) {
+  std::string channel_name = this->getChannelName();
+
+  std::string se = ":" + server_name + " 324 " + nickname + " " + channel_name +
+                   " +" + this->getModes(fd) + "\r\n";
+  sendString(se, fd);
+
+  std::string se2 = ":" + server_name + " 329 " + nickname + " " +
+                    channel_name + " " + intToString(this->getTimestamp()) +
+                    "\r\n";
+  sendString(se2, fd);
+}
+
 // ----------------------------------------------------------------------------
 
 std::string Channel::getKey() const {

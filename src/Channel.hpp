@@ -50,6 +50,7 @@ class Channel {
   // ----------------------------------------------------
 
   std::string getModes(int fd) const;
+  void printCurMode(int fd, std::string server_name, std::string nickname);
 
   std::string getKey() const;
   int getLimit() const;
