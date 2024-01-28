@@ -41,15 +41,15 @@ typedef struct s_mode {
 
 class Server {
  private:
-  int serv_fd;
-  struct sockaddr_in serv_adr;
-  std::vector<struct pollfd> fds;
-  std::string read_buf;
+  int _serv_fd;
+  struct sockaddr_in _serv_adr;
+  std::vector<struct pollfd> _fds;
+  std::string _read_buf;
 
   // -------------------------------------------------------------
 
   std::string _password;
-  std::map<std::string, int> command_list;
+  std::map<std::string, int> _command_list;
 
   // -------------------------------------------------------------
   // ????????clients fd 그대로 쓸 수 있는거 확인해서 바꾸기
@@ -87,10 +87,10 @@ class Server {
   int isUser(std::string nickname);
 
   // -------------------------- loop -----------------------------
-
-  void acceptLoop();
-  void recvMsg(int fd);
+  void acceptClient(void);
   void disconnectClient(int fd);
+  void acceptLoop(void);
+  void recvMsg(int fd);
 
   // --------------------------
 

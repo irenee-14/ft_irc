@@ -33,7 +33,7 @@ std::vector<std::string> splitCommand(const std::string str) {
 
 void Server::executeCommand(int fd, std::vector<std::string> tokens) {
   // token[0]을 command_list와 비교해서 switch문으로 처리
-  switch (command_list[tokens[0]]) {
+  switch (_command_list[tokens[0]]) {
     case NICK:
       nick(fd, tokens[1]);
       break;
