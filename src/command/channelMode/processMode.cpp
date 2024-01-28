@@ -1,5 +1,8 @@
+#include <cstdlib>  // atoi
+
 #include "Server.hpp"
 
+// -------------------------------- "o" --------------------------------
 bool Server::processModeO(int fd, std::vector<std::string>::iterator& it,
                           Channel& channel, const std::string nickname,
                           bool isAddMode) {
@@ -31,7 +34,7 @@ bool Server::processModeO(int fd, std::vector<std::string>::iterator& it,
   return (true);
 }
 
-// ---------------------------------------------------------------
+// -------------------------------- "k" --------------------------------
 
 bool Server::processModeK(std::vector<std::string>::iterator& it,
                           Channel& channel, bool isAddMode) {
@@ -52,7 +55,7 @@ bool Server::processModeK(std::vector<std::string>::iterator& it,
   return (true);
 }
 
-// ---------------------------------------------------------------
+// -------------------------------- "l" --------------------------------
 
 std::string Server::processModeL(std::vector<std::string>::iterator& it,
                                  Channel& channel, bool isAddMode) {
@@ -60,11 +63,11 @@ std::string Server::processModeL(std::vector<std::string>::iterator& it,
   if (isAddMode) {
     int retLimit = std::atoi((*it).c_str());
     channel.setLimit(retLimit);
-    return (intToString(retLimit));
     it++;
+    return (intToString(retLimit));
   } else if (channel.getLimit() != -1) {
     channel.setLimit(-1);
     return ("");
   }
-  throw 1;
+  throw(1);
 }
