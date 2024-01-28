@@ -20,7 +20,14 @@ void Server::userhost(int fd, std::vector<std::string> tokens) {
   // userhost root_ root
   // :irc.local 302 root :root_=+root@127.0.0.1 root=+root@127.0.0.1
   for (unsigned int i = 1; i < tokens.size(); ++i) {
-    se += nickname + "=+" + username + "@" + servername + " ";
+    // nickname에 맞는 client 찾기
+    int user_fd = isUser(tokens[i]);
+    if (user_fd >= 0) {
+      const std::string user_nickname = clients[user_fd].getNick();
+      const std::string user_username = clients[user_fd].getUser();
+      const std::string user_servername = clients[user_fd].getServerName();
+      se += user_nickname + "=+" + user_username + "@" + user_servername + " ";
+    }
   }
   // 마지막에 \r\n 붙여서 보내기, 찾는 nickname이 없으면 개행만 보냄
   se += "\r\n";
