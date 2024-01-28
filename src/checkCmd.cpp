@@ -84,7 +84,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
   }
 }
 
-void Server::checkCommand(struct pollfd fds, char* buf) {
+void Server::checkCommand(int fd, char* buf) {
   std::stringstream ss;
   ss.str("");
   ss << buf;
@@ -92,32 +92,32 @@ void Server::checkCommand(struct pollfd fds, char* buf) {
   std::string line;
 
   while (std::getline(ss, line)) {
-    if (line.c_str()[line.length() - 1] != '\r') break;
+    // if (line.c_str()[line.length() - 1] != '\r') break;
 
     std::string str = line.substr(0, line.find("\r"));
 
     if (str.find("CAP LS") == 0) {
       const char* se = "CAP * LS\r\n";
-      send(fds.fd, se, strlen(se), 0);
+      send(fd, se, strlen(se), 0);
     } else if (str.find("CAP END") == 0 || str.find("JOIN :") == 0)
       ;
     else {
       std::vector<std::string> tokens = splitCommand(str);
 
       if (tokens[0] == "PASS")
-        pass(fds.fd, tokens[1]);
-      else if (tokens[0] != "" && !clients[fds.fd].getPassFlag())
+        pass(fd, tokens);
+      else if (tokens[0] != "" && !clients[fd].getPassFlag())
         throw std::string("password does not exist");
       else
-        executeCommand(fds.fd, tokens);
+        executeCommand(fd, tokens);
 
-      if (!clients[fds.fd].getNickFlag() && clients[fds.fd].getNick() != "" &&
-          clients[fds.fd].getUser() != "") {
-        clients[fds.fd].setTimestamp(time(0));
-        std::string se = ":" + SERVER_NAME + " 001 " +
-                         clients[fds.fd].getNick() + " :Welcome\r\n";
-        sendString(se, fds.fd);
-        clients[fds.fd].setNickFlag(true);
+      if (!clients[fd].getNickFlag() && clients[fd].getNick() != "" &&
+          clients[fd].getUser() != "") {
+        clients[fd].setTimestamp(time(0));
+        std::string se = ":" + SERVER_NAME + " 001 " + clients[fd].getNick() +
+                         " :Welcome\r\n";
+        sendString(se, fd);
+        clients[fd].setNickFlag(true);
       }
     }
     line.clear();

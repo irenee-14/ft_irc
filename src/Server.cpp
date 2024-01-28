@@ -91,6 +91,26 @@ const std::vector<struct pollfd> Server::getPollFds() const {
   return (this->fds);
 }
 
+// ----------------------------------------------------------------------
+
+int Server::isChannel(std::string channel_name) {
+  for (unsigned int i = 0; i < channels.size(); i++) {
+    if (channels[i].getChannelName() == channel_name) {
+      return (i);
+    }
+  }
+  return (-1);
+}
+
+int Server::isUser(std::string nickname) {
+  for (unsigned int i = 0; i < clients.size(); i++) {
+    if (clients[i].getNick() == nickname) {
+      return (i);
+    }
+  }
+  return (-1);
+}
+
 // ---------------------------------------------------------------
 
 void Server::acceptLoop() {
@@ -122,65 +142,116 @@ void Server::acceptLoop() {
     // client에서 온 요청
     for (unsigned int i = 1; i < fds.size(); ++i) {
       if (fds[i].revents & (POLLHUP | POLLERR))  // POLLHUP : 연결 끊어짐
-      {
-        close(fds[i].fd);
-        fds.erase(fds.begin() + i);
-        printArg("closed client: ", fds[i].fd);
-      } else if (fds[i].revents & POLLIN) {
-        char buf[BUF_SIZE];
-        memset(buf, 0, BUF_SIZE);
-
-        int str_len;
-
-        str_len = recv(fds[i].fd, buf, BUF_SIZE, 0);
-
-        //  ctrl + D
-        //  if (str_len == 0) {
-        //    close(fds[i].fd);
-        //    fds.erase(fds.begin() + i);
-        //    std::cout << "closed client: " << fds[i].fd << std::endl;
-        //  } else
-        buf[str_len++] = '\0';
-        {
-          write(1, buf, str_len);
-
-          printArg("\n-----------------------------------------------\n", "");
-          try {
-            checkCommand(fds[i], buf);
-            memset(buf, 0, BUF_SIZE);
-          } catch (std::string exception) {
-            // client에게도 에러 메시지 보내줘야함
-            std::string se =
-                "ERROR Closing link: [Access denied by configuration]\r\n";
-            sendString(se, fds[i].fd);
-
-            close(fds[i].fd);
-            fds.erase(fds.begin() + i);
-            printArg("closed client: ", fds[i].fd);
-          }
-          printArg("\n===============================================\n", "");
-        }
-      }
+        disconnectClient(fds[i].fd);
+      else if (fds[i].revents & POLLIN)
+        recvMsg(fds[i].fd);
     }
   }
 }
 
-// ----------------------------------------------------------------------
+// void Server::recvMsg(int fd) {
+//   char buf[BUF_SIZE];
+//   memset(buf, 0, BUF_SIZE);
 
-int Server::isChannel(std::string channel_name) {
-  for (unsigned int i = 0; i < channels.size(); i++) {
-    if (channels[i].getChannelName() == channel_name) {
-      return (i);
-    }
+//  int str_len;
+
+//  str_len = recv(fd, buf, BUF_SIZE, 0);
+
+//  buf[str_len++] = '\0';
+//  {
+//    write(1, buf, str_len);
+
+//    printArg("\n-----------------------------------------------\n", "");
+//    try {
+//      checkCommand(fd, buf);
+//      memset(buf, 0, BUF_SIZE);
+//    } catch (std::string exception) {
+//      // client에게도 에러 메시지 보내줘야함
+//      std::string se =
+//          "ERROR Closing link: [Access denied by configuration]\r\n";
+//      sendString(se, fd);
+
+//      close(fd);
+//      fds.erase(fds.begin() + i);
+//      printArg("closed client: ", fd);
+//    }
+//    printArg("\n===============================================\n", "");
+//  }
+//}
+
+void Server::recvMsg(int fd) {
+  char buf[BUF_SIZE + 1];
+  memset(buf, 0, BUF_SIZE + 1);
+
+  int recv_len;
+
+  recv_len = recv(fd, buf, BUF_SIZE, 0);
+  if (recv_len < 0) {
+    printArg("recv failed", "");
+    disconnectClient(fd);
+    return;
   }
-  return (-1);
+
+  buf[recv_len] = '\0';
+
+  // checkCRLF()
+
+  write(1, buf, recv_len);
+  printArg("\n-----------------------------------------------\n", "");
+  try {
+    checkCommand(fd, buf);
+    memset(buf, 0, BUF_SIZE + 1);
+  } catch (std::string exception) {
+    // client에게도 에러 메시지 보내줘야함, pass 불일치
+    std::string se = "ERROR Closing link: [Access denied by configuration]\r\n";
+    sendString(se, fd);
+    disconnectClient(fd);
+  }
+  printArg("\n===============================================\n", "");
 }
 
-int Server::isUser(std::string nickname) {
-  for (unsigned int i = 0; i < clients.size(); i++) {
-    if (clients[i].getNick() == nickname) {
-      return (i);
-    }
-  }
-  return (-1);
+void Server::disconnectClient(int fd) {
+  close(fd);
+  fds.erase(fds.begin() + i);
+  printArg("closed client: ", fd);
 }
+
+// void Server::recvMessage(int clientSocket) {
+//   char buf[MAX_MESSAGE_SIZE + 1];
+//   map<int, User*>::iterator it = this->_users.find(clientSocket);
+//   User* user = it->second;
+//   int recvSize;
+//   if (it == this->_users.end()) return;
+//   if ((recvSize = recv(clientSocket, buf, MAX_MESSAGE_SIZE + 1, 0)) <= 0) {
+//     cerr << "Error: recv failed" << endl;
+//     disconnectClient(clientSocket);
+//   } else {
+//     buf[recvSize] = '\0';
+//     user->appendCommand(buf);
+//     handleCmdMessage(user);
+//   }
+// }
+
+// void Server::handleCmdMessage(User* user) {
+//   while (true) {
+//     size_t crlfPos = findCRLF(user->getCommandBuffer());
+//     if (crlfPos == string::npos) {
+//       break;
+//     }
+//     if (crlfPos == 0) {
+//       user->setCommandBuffer(user->getCommandBuffer().substr(1));
+//       continue;
+//     }
+//     // crlf 위치까지의 문자열을 Message 객체로 생성 (message 안에서 파싱)
+//     Message message(user->getCommandBuffer().substr(0, crlfPos));
+//     user->setCommandBuffer(user->getCommandBuffer().substr(crlfPos + 1));
+//     this->_command->handleCommand(message, user);
+//   }
+// }
+// size_t Server::findCRLF(string message) {
+//   size_t crPos = message.find("\r");
+//   size_t lfPos = message.find("\n");
+//   if (lfPos == string::npos) return crPos;
+//   if (crPos == string::npos) return lfPos;
+//   return min(crPos, lfPos);
+// }

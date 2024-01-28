@@ -75,17 +75,21 @@ class Server {
 
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
-
-  // -------------------------- loop -----------------------------
-
-  void acceptLoop();
-  void executeCommand(int fd, std::vector<std::string> tokens);
-  void checkCommand(struct pollfd fds, char* buf);
-
   // --------------------------- is ------------------------------
 
   int isChannel(std::string channel_name);
   int isUser(std::string nickname);
+
+  // -------------------------- loop -----------------------------
+
+  void acceptLoop();
+  void recvMsg(int fd);
+  void disconnectClient(int fd);
+
+  // --------------------------
+
+  void executeCommand(int fd, std::vector<std::string> tokens);
+  void checkCommand(int fd, char* buf);
 
   // =============================================================
   // ---------------------- channel Mode -------------------------
@@ -120,7 +124,7 @@ class Server {
   // ------------------- connection Message ----------------------
 
   void nick(int fd, std::string nickname);
-  void pass(int fd, std::string password);
+  void pass(int fd, std::vector<std::string> tokens);
   void pong(int fd);
   void quit(int fd);
   void user(int fd, std::vector<std::string> tokens);
