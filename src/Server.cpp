@@ -91,6 +91,12 @@ const std::vector<struct pollfd> Server::getPollFds() const {
   return (this->fds);
 }
 
+std::string Server::getReadBuf() const { return (this->read_buf); }
+void Server::setReadBuf(std::string const& buf) { this->read_buf += buf; }
+void Server::clearReadBuf() {
+  this->read_buf.clear();
+  this->read_buf = "";
+}
 // ----------------------------------------------------------------------
 
 int Server::isChannel(std::string channel_name) {
@@ -142,116 +148,63 @@ void Server::acceptLoop() {
     // client에서 온 요청
     for (unsigned int i = 1; i < fds.size(); ++i) {
       if (fds[i].revents & (POLLHUP | POLLERR))  // POLLHUP : 연결 끊어짐
+      {
         disconnectClient(fds[i].fd);
-      else if (fds[i].revents & POLLIN)
+        continue;
+      } else if (fds[i].revents & POLLIN) {
         recvMsg(fds[i].fd);
+        continue;
+      }
     }
   }
 }
-
-// void Server::recvMsg(int fd) {
-//   char buf[BUF_SIZE];
-//   memset(buf, 0, BUF_SIZE);
-
-//  int str_len;
-
-//  str_len = recv(fd, buf, BUF_SIZE, 0);
-
-//  buf[str_len++] = '\0';
-//  {
-//    write(1, buf, str_len);
-
-//    printArg("\n-----------------------------------------------\n", "");
-//    try {
-//      checkCommand(fd, buf);
-//      memset(buf, 0, BUF_SIZE);
-//    } catch (std::string exception) {
-//      // client에게도 에러 메시지 보내줘야함
-//      std::string se =
-//          "ERROR Closing link: [Access denied by configuration]\r\n";
-//      sendString(se, fd);
-
-//      close(fd);
-//      fds.erase(fds.begin() + i);
-//      printArg("closed client: ", fd);
-//    }
-//    printArg("\n===============================================\n", "");
-//  }
-//}
 
 void Server::recvMsg(int fd) {
   char buf[BUF_SIZE + 1];
   memset(buf, 0, BUF_SIZE + 1);
 
   int recv_len;
-
   recv_len = recv(fd, buf, BUF_SIZE, 0);
+  buf[recv_len] = '\0';
+  // write(1, buf, recv_len);
+
   if (recv_len < 0) {
     printArg("recv failed", "");
-    disconnectClient(fd);
+    this->disconnectClient(fd);
     return;
+  } else if (recv_len == 0) {
+    this->disconnectClient(fd);
+    return;
+  } else {
+    this->setReadBuf(buf);
+
+    if (findCRLF(this->getReadBuf()) != std::string::npos) {
+      write(1, buf, recv_len);
+      printArg("\n-----------------------------------------------\n", "");
+      try {
+        checkCommand(fd, this->getReadBuf());
+        this->clearReadBuf();
+      } catch (std::string exception) {
+        // client에게도 에러 메시지 보내줘야함, pass 불일치
+        std::string se =
+            "ERROR Closing link: [Access denied by configuration]\r\n";
+        sendString(se, fd);
+        disconnectClient(fd);
+        this->clearReadBuf();
+      }
+      printArg("\n===============================================\n", "");
+    }
   }
-
-  buf[recv_len] = '\0';
-
-  // checkCRLF()
-
-  write(1, buf, recv_len);
-  printArg("\n-----------------------------------------------\n", "");
-  try {
-    checkCommand(fd, buf);
-    memset(buf, 0, BUF_SIZE + 1);
-  } catch (std::string exception) {
-    // client에게도 에러 메시지 보내줘야함, pass 불일치
-    std::string se = "ERROR Closing link: [Access denied by configuration]\r\n";
-    sendString(se, fd);
-    disconnectClient(fd);
-  }
-  printArg("\n===============================================\n", "");
 }
 
 void Server::disconnectClient(int fd) {
   close(fd);
-  fds.erase(fds.begin() + i);
+
+  for (size_t i = 0; i < fds.size(); ++i) {
+    if (fds[i].fd == fd) {
+      fds.erase(fds.begin() + i);
+      break;
+    }
+  }
   printArg("closed client: ", fd);
 }
-
-// void Server::recvMessage(int clientSocket) {
-//   char buf[MAX_MESSAGE_SIZE + 1];
-//   map<int, User*>::iterator it = this->_users.find(clientSocket);
-//   User* user = it->second;
-//   int recvSize;
-//   if (it == this->_users.end()) return;
-//   if ((recvSize = recv(clientSocket, buf, MAX_MESSAGE_SIZE + 1, 0)) <= 0) {
-//     cerr << "Error: recv failed" << endl;
-//     disconnectClient(clientSocket);
-//   } else {
-//     buf[recvSize] = '\0';
-//     user->appendCommand(buf);
-//     handleCmdMessage(user);
-//   }
-// }
-
-// void Server::handleCmdMessage(User* user) {
-//   while (true) {
-//     size_t crlfPos = findCRLF(user->getCommandBuffer());
-//     if (crlfPos == string::npos) {
-//       break;
-//     }
-//     if (crlfPos == 0) {
-//       user->setCommandBuffer(user->getCommandBuffer().substr(1));
-//       continue;
-//     }
-//     // crlf 위치까지의 문자열을 Message 객체로 생성 (message 안에서 파싱)
-//     Message message(user->getCommandBuffer().substr(0, crlfPos));
-//     user->setCommandBuffer(user->getCommandBuffer().substr(crlfPos + 1));
-//     this->_command->handleCommand(message, user);
-//   }
-// }
-// size_t Server::findCRLF(string message) {
-//   size_t crPos = message.find("\r");
-//   size_t lfPos = message.find("\n");
-//   if (lfPos == string::npos) return crPos;
-//   if (crPos == string::npos) return lfPos;
-//   return min(crPos, lfPos);
-// }

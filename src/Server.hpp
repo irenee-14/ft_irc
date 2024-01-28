@@ -44,6 +44,7 @@ class Server {
   int serv_fd;
   struct sockaddr_in serv_adr;
   std::vector<struct pollfd> fds;
+  std::string read_buf;
 
   // -------------------------------------------------------------
 
@@ -75,6 +76,11 @@ class Server {
 
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
+
+  std::string getReadBuf() const;
+  void setReadBuf(std::string const& buf);
+  void clearReadBuf();
+
   // --------------------------- is ------------------------------
 
   int isChannel(std::string channel_name);
@@ -89,7 +95,7 @@ class Server {
   // --------------------------
 
   void executeCommand(int fd, std::vector<std::string> tokens);
-  void checkCommand(int fd, char* buf);
+  void checkCommand(int fd, std::string buf);
 
   // =============================================================
   // ---------------------- channel Mode -------------------------

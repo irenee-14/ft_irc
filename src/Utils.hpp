@@ -25,5 +25,6 @@ void printArg(char const *str, T arg) {
 }
 
 std::string intToString(int value);
+size_t findCRLF(std::string buf);
 
 #endif

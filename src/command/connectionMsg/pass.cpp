@@ -10,4 +10,5 @@ void Server::pass(int fd, std::vector<std::string> tokens) {
   }
   // fd에 해당하는 client의 pass_flag를 true로 바꿔줌
   clients[fd].setPassFlag(true);
+  printArg("correct password", "");
 }

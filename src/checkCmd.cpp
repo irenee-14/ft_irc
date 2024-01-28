@@ -84,21 +84,18 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
   }
 }
 
-void Server::checkCommand(int fd, char* buf) {
+void Server::checkCommand(int fd, std::string buf) {
   std::stringstream ss;
-  ss.str("");
   ss << buf;
 
   std::string line;
 
   while (std::getline(ss, line)) {
-    // if (line.c_str()[line.length() - 1] != '\r') break;
-
-    std::string str = line.substr(0, line.find("\r"));
+    std::string str = line.substr(0, findCRLF(line));
 
     if (str.find("CAP LS") == 0) {
       const char* se = "CAP * LS\r\n";
-      send(fd, se, strlen(se), 0);
+      write(fd, se, strlen(se));
     } else if (str.find("CAP END") == 0 || str.find("JOIN :") == 0)
       ;
     else {
@@ -114,6 +111,7 @@ void Server::checkCommand(int fd, char* buf) {
       if (!clients[fd].getNickFlag() && clients[fd].getNick() != "" &&
           clients[fd].getUser() != "") {
         clients[fd].setTimestamp(time(0));
+
         std::string se = ":" + SERVER_NAME + " 001 " + clients[fd].getNick() +
                          " :Welcome\r\n";
         sendString(se, fd);
