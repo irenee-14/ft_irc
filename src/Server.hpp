@@ -143,4 +143,6 @@ class Server {
   // =============================================================
 };
 
+void sendMotd(int fd, Client client);
+
 #endif

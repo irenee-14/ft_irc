@@ -111,11 +111,8 @@ void Server::checkCommand(int fd, std::string buf) {
       if (!clients[fd].getNickFlag() && clients[fd].getNick() != "" &&
           clients[fd].getUser() != "") {
         clients[fd].setTimestamp(time(0));
-
-        std::string se = ":" + SERVER_NAME + " 001 " + clients[fd].getNick() +
-                         " :Welcome\r\n";
-        sendString(se, fd);
         clients[fd].setNickFlag(true);
+        sendMotd(fd, clients[fd]);
       }
     }
     line.clear();
