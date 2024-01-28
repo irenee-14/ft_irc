@@ -7,6 +7,14 @@ void Server::nick(int fd, std::string nickname) {
   // 기존 닉네임과 동일 → 무시
   if (clients[fd].getNick() == nickname) return;
 
+  // 닉네임 유효성 검사
+  if (!isValidNick(nickname)) {
+    std::string se = ":" + SERVER_NAME + " 432 * " + nickname +
+                     " :Erroneous nickname\r\n";
+    sendString(se, fd);
+    return;
+  }
+
   int nick_idx = isUser(nickname);
   if (nick_idx >= 0) {
     std::string se = ":" + SERVER_NAME + " 433 * " + nickname +

@@ -17,3 +17,23 @@ std::string intToString(int value) {
   ss << value;
   return ss.str();
 }
+
+bool isSpecialChar(char c) {
+  // "[", "]", "\", "`", "_", "^", "{", "|", "}"
+  if (c == '[' || c == ']' || c == '\\' || c == '`' || c == '_' || c == '^' ||
+      c == '{' || c == '|' || c == '}') {
+    return true;
+  }
+  return false;
+}
+
+bool isValidNick(std::string nickname) {
+  if (nickname.length() > 9) return false;
+  if (!isalpha(nickname[0]) && !isSpecialChar(nickname[0])) return false;
+  for (unsigned int i = 1; i < nickname.length(); ++i) {
+    if (!isalnum(nickname[i]) && nickname[i] != '-' &&
+        isSpecialChar(nickname[i]))
+      return false;
+  }
+  return true;
+}
