@@ -122,7 +122,7 @@ class Server {
   void nick(int fd, std::string nickname);
   void pass(int fd, std::string password);
   void pong(int fd);
-  void quit(int fd);
+  void quit(int fd, std::string msg);
   void user(int fd, std::vector<std::string> tokens);
 
   // ------------------- optional Message -----------------------

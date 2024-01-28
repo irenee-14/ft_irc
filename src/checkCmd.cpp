@@ -77,7 +77,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
       mode(fd, tokens);
       break;
     case QUIT:
-      quit(fd);
+      quit(fd, tokens[1]);
       break;
     default:
       break;

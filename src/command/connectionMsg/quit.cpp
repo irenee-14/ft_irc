@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-void Server::quit(int fd) {
+void Server::quit(int fd, std::string msg) {
   const std::string nickname = clients[fd].getNick();
   const std::string username = clients[fd].getUser();
   const std::string servername = clients[fd].getServerName();
@@ -19,7 +19,7 @@ void Server::quit(int fd) {
       // 채널에 속한 모든 user에게 quit메시지 보내기
       if (channels[i].getUserFds().size() > 0) {
         std::string se = ":" + nickname + "!" + username + "@" + servername +
-                         " QUIT :leaving\r\n";
+                         " QUIT :" + msg + "\r\n";
         sendString(se, channels[i].getUserFds());
       }
 
@@ -31,6 +31,6 @@ void Server::quit(int fd) {
   }
   // server에 quit 메시지 보내기
   std::string se = "ERROR :Closing link: (" + username + "@" + servername +
-                   ") [Quit: leaving]\r\n";
+                   ") [Quit: " + msg + "]\r\n";
   sendString(se, fd);
 }
