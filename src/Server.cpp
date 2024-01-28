@@ -15,15 +15,20 @@ Server::Server(void) {}
 
 Server::Server(char** argv) {
   this->_password = argv[2];
+  int port = std::atoi(argv[1]);
+  if (port < 1024 || port > 49151) {
+    throw std::string("port number must be between 1024 and 49151");
+  }
+
   // 서버 소켓 생성
-  serv_fd = socket(PF_INET, SOCK_STREAM, 0);
+  this->serv_fd = socket(PF_INET, SOCK_STREAM, 0);
   if (this->serv_fd == -1) throw std::string("socket()");
 
   // 서버에 소켓 주소 생성
   memset(&serv_adr, 0, sizeof(this->serv_adr));
   this->serv_adr.sin_family = AF_INET;
   this->serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
-  this->serv_adr.sin_port = htons(std::atoi(argv[1]));
+  this->serv_adr.sin_port = htons(port);
 
   int flag = 1;
   if (setsockopt(this->serv_fd, SOL_SOCKET, SO_REUSEADDR, &flag,
