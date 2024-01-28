@@ -128,7 +128,7 @@ class Server {
   // ------------------- optional Message -----------------------
 
   void userhost(int fd, std::vector<std::string> tokens);
-  void whois(int fd, std::string target);
+  void whois(int fd, std::string targets);
 
   // =============================================================
 };
