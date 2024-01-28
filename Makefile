@@ -35,7 +35,8 @@ SRCS			=	$(addprefix $(SRCS_DIR)/, $(SRCS_FILES))
 
 
 MODE_DIR		=	./src/command/channelMode
-MODE_FILES		=	mode.cpp
+MODE_FILES		=	mode.cpp \
+					processMode.cpp
 MODE			=	$(addprefix $(MODE_DIR)/, $(MODE_FILES))
 
 CHANNEL_DIR		=	./src/command/channelOper

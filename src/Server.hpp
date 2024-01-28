@@ -92,6 +92,16 @@ class Server {
 
   void mode(int fd, std::vector<std::string> tokens);
 
+  bool processModeO(int fd, std::vector<std::string>::iterator& it,
+                    Channel& channel, const std::string nickname,
+                    bool isAddMode);
+
+  bool processModeK(std::vector<std::string>::iterator& it, Channel& channel,
+                    bool isAddMode);
+
+  std::string processModeL(std::vector<std::string>::iterator& it,
+                           Channel& channel, bool isAddMode);
+
   // -------------------- channel Operator -----------------------
 
   void invite(int fd, std::vector<std::string> tokens);
