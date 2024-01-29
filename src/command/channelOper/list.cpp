@@ -10,7 +10,7 @@ const std::string RPL_LIST(const std::string nickname, Channel channel,
 // -----------------------------------------------------------
 
 void Server::list(int fd, std::vector<std::string> tokens) {
-  const std::string channel = tokens[1];
+  const std::string channel = tokens.size() > 1 ? tokens[1] : "";
   const std::string nickname = clients[fd].getNick();
 
   unsigned int size = channels.size();
