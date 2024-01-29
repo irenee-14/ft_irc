@@ -28,6 +28,7 @@ enum command_enum {
   INVITE,
   TOPIC,
   MODE,
+  MOTD,
   QUIT
 };
 
@@ -41,14 +42,16 @@ typedef struct s_mode {
 
 class Server {
  private:
-  int serv_fd;
-  struct sockaddr_in serv_adr;
-  std::vector<struct pollfd> fds;
+  int _serv_fd;
+  struct sockaddr_in _serv_adr;
+  std::vector<struct pollfd> _fds;
+  std::string _read_buf;
 
   // -------------------------------------------------------------
 
+  unsigned int _port;
   std::string _password;
-  std::map<std::string, int> command_list;
+  std::map<std::string, int> _command_list;
 
   // -------------------------------------------------------------
 
@@ -76,16 +79,25 @@ class Server {
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
 
-  // -------------------------- loop -----------------------------
-
-  void acceptLoop();
-  void executeCommand(int fd, std::vector<std::string> tokens);
-  void checkCommand(struct pollfd fds, char* buf);
+  std::string getReadBuf() const;
+  void setReadBuf(std::string const& buf);
+  void clearReadBuf();
 
   // --------------------------- is ------------------------------
 
   int isChannel(std::string channel_name);
   int isUser(std::string nickname);
+
+  // -------------------------- loop -----------------------------
+  void acceptClient(void);
+  void disconnectClient(int fd);
+  void acceptLoop(void);
+  void recvMsg(int fd);
+
+  // --------------------------
+
+  void executeCommand(int fd, std::vector<std::string> tokens);
+  void checkCommand(int fd, std::string buf);
 
   // =============================================================
   // ---------------------- channel Mode -------------------------
@@ -120,7 +132,7 @@ class Server {
   // ------------------- connection Message ----------------------
 
   void nick(int fd, std::string nickname);
-  void pass(int fd, std::string password);
+  void pass(int fd, std::vector<std::string> tokens);
   void pong(int fd);
   void quit(int fd, std::string msg);
   void user(int fd, std::vector<std::string> tokens);
@@ -128,7 +140,9 @@ class Server {
   // ------------------- optional Message -----------------------
 
   void userhost(int fd, std::vector<std::string> tokens);
-  void whois(int fd, std::string targets);
+  void whois(int fd, std::string target);
+  void sendWelcome(int fd, Client client);
+  void motd(int fd);
 
   // =============================================================
 };

@@ -59,7 +59,8 @@ CONNECT_FILES	=	nick.cpp \
 CONNECT			=	$(addprefix $(CONNECT_DIR)/, $(CONNECT_FILES))
 
 OPTION_DIR		=	./src/command/optionalMsg
-OPTION_FILES	=	userhost.cpp \
+OPTION_FILES	=	motd.cpp \
+					userhost.cpp \
 					whois.cpp
 OPTION			=	$(addprefix $(OPTION_DIR)/, $(OPTION_FILES))
 

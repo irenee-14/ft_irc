@@ -25,6 +25,7 @@ void printArg(char const *str, T arg) {
 }
 
 std::string intToString(int value);
+size_t findCRLF(std::string buf);
 
 bool isValidNick(std::string nickname);
 

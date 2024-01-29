@@ -4,7 +4,7 @@
 // :joyoo!root@127.0.0.1 TOPIC #hi :hi
 
 void Server::topic(int fd, std::vector<std::string> tokens) {
-  const std::string channel = tokens[1];
+  const std::string channel = tokens.size() > 1 ? tokens[1] : "";
   if (tokens.size() < 2) {
     const std::string se = ":" + SERVER_NAME + " 461 " + clients[fd].getNick() +
                            " TOPIC :Not enough parameters.\r\n";
@@ -12,7 +12,7 @@ void Server::topic(int fd, std::vector<std::string> tokens) {
     return;
   }
   const std::string channelNoHash = tokens[1].substr(1, tokens[1].size() - 1);
-  const std::string topic = tokens[2];
+  const std::string topic = tokens.size() > 2 ? tokens[2] : "";
 
   const std::string nickname = clients[fd].getNick();
   const std::string username = clients[fd].getUser();

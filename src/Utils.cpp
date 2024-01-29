@@ -20,6 +20,13 @@ std::string intToString(int value) {
   return ss.str();
 }
 
+size_t findCRLF(std::string buf) {
+  size_t crPos = buf.find("\r");
+  size_t lfPos = buf.find("\n");
+  if (lfPos == std::string::npos) return crPos;
+  if (crPos == std::string::npos) return lfPos;
+  return std::min(crPos, lfPos);
+}
 // -------------------------------------------------------------
 
 bool isSpecialChar(char c) {

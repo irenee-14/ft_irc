@@ -4,7 +4,7 @@
 
 void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   const std::string target = tokens[1];
-  const std::string message = tokens[2];
+  const std::string message = tokens.size() > 2 ? tokens[2] : "";
 
   const std::string nickname = clients[fd].getNick();
   const std::string username = clients[fd].getUser();
