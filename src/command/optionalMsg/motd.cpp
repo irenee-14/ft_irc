@@ -12,7 +12,7 @@ std::string convertTimeToString(time_t unixTime) {
   return (buffer);
 }
 
-void sendMotd(int fd, Client client, int port, int client_num) {
+void Server::sendWelcome(int fd, Client client) {
   const std::string nickname = client.getNick();
   const std::string username = client.getUser();
   const std::string servername = client.getServerName();
@@ -33,14 +33,19 @@ void sendMotd(int fd, Client client, int port, int client_num) {
           " FT_IRC-1 i :oklit\r\n";
     //"Try server <server name>, port <port number>"
     se += ":" + SERVER_NAME + " 005 " + nickname + " Try server " +
-          SERVER_NAME + ", port " + intToString(port) + "\r\n";
+          SERVER_NAME + ", port " + intToString(_port) + "\r\n";
 
     //  :There are <integer> users on <integer> servers
     se += ":" + SERVER_NAME + " 251 " + nickname + " :There are " +
-          intToString(client_num) + " users on 1 servers\r\n";
+          intToString(_fds.size() - 2) + " users on 1 servers\r\n";
     sendString(se, fd);
   }
   // -----------------------------------------------------------------------
+  motd(fd);
+}
+
+void Server::motd(int fd) {
+  const std::string nickname = clients[fd].getNick();
 
   std::ifstream data;
   char filepath[24] = "src/config/motd.config";

@@ -84,7 +84,8 @@ void Server::initializeCommandList() {
     _command_list["INVITE"] = 12;
     _command_list["TOPIC"] = 13;
     _command_list["MODE"] = 14;
-    _command_list["QUIT"] = 15;
+    _command_list["motd"] = 15;
+    _command_list["QUIT"] = 16;
   }
 }
 

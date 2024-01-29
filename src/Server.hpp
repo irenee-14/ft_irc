@@ -28,6 +28,7 @@ enum command_enum {
   INVITE,
   TOPIC,
   MODE,
+  MOTD,
   QUIT
 };
 
@@ -140,10 +141,10 @@ class Server {
 
   void userhost(int fd, std::vector<std::string> tokens);
   void whois(int fd, std::string target);
+  void sendWelcome(int fd, Client client);
+  void motd(int fd);
 
   // =============================================================
 };
-
-void sendMotd(int fd, Client client, int port, int client_num);
 
 #endif

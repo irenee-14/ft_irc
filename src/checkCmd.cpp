@@ -76,6 +76,9 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
     case MODE:
       mode(fd, tokens);
       break;
+    case MOTD:
+      motd(fd);
+      break;
     case QUIT:
       quit(fd);
       break;
@@ -112,7 +115,7 @@ void Server::checkCommand(int fd, std::string buf) {
           clients[fd].getUser() != "") {
         clients[fd].setTimestamp(time(0));
         clients[fd].setNickFlag(true);
-        sendMotd(fd, clients[fd], _port, _fds.size() - 2);
+        sendWelcome(fd, clients[fd]);
       }
     }
     line.clear();
