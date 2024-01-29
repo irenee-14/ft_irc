@@ -51,7 +51,7 @@ class Server {
   std::map<std::string, int> command_list;
 
   // -------------------------------------------------------------
-  // ????????clients fd 그대로 쓸 수 있는거 확인해서 바꾸기
+
   std::map<int, Client> clients;
   std::vector<Channel> channels;
 
