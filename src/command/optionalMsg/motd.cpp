@@ -20,7 +20,7 @@ void Server::sendWelcome(int fd, Client client) {
   {
     std::string se;
     se += ":" + SERVER_NAME + " 001 " + nickname +
-          " :Welcome to the Internet Relay Network" + nickname + "!" +
+          " :Welcome to the Internet Relay Network " + nickname + "!" +
           username + "@" + servername + "\r\n";
     se += ":" + SERVER_NAME + " 002 " + nickname + " :Your host is " +
           SERVER_NAME + " (localhost), running version FT_IRC-1\r\n";
