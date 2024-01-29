@@ -14,6 +14,7 @@
 Server::Server(void) {}
 
 Server::Server(char** argv) {
+  this->_port = std::atoi(argv[1]);
   this->_password = argv[2];
   // 서버 소켓 생성
   _serv_fd = socket(PF_INET, SOCK_STREAM, 0);
@@ -23,7 +24,7 @@ Server::Server(char** argv) {
   memset(&_serv_adr, 0, sizeof(this->_serv_adr));
   this->_serv_adr.sin_family = AF_INET;
   this->_serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
-  this->_serv_adr.sin_port = htons(std::atoi(argv[1]));
+  this->_serv_adr.sin_port = htons(_port);
 
   int flag = 1;
   if (setsockopt(this->_serv_fd, SOL_SOCKET, SO_REUSEADDR, &flag,
@@ -56,7 +57,9 @@ Server& Server::operator=(Server const& rhs) {
     this->_serv_adr = rhs._serv_adr;
     this->_fds = rhs._fds;
     this->_read_buf = rhs._read_buf;
+    this->_port = rhs._port;
     this->_password = rhs._password;
+    this->_command_list = rhs._command_list;
     this->clients = rhs.clients;
     this->channels = rhs.channels;
   }

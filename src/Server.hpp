@@ -48,6 +48,7 @@ class Server {
 
   // -------------------------------------------------------------
 
+  unsigned int _port;
   std::string _password;
   std::map<std::string, int> _command_list;
 
@@ -143,6 +144,6 @@ class Server {
   // =============================================================
 };
 
-void sendMotd(int fd, Client client);
+void sendMotd(int fd, Client client, int port, int client_num);
 
 #endif

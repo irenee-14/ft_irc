@@ -112,7 +112,7 @@ void Server::checkCommand(int fd, std::string buf) {
           clients[fd].getUser() != "") {
         clients[fd].setTimestamp(time(0));
         clients[fd].setNickFlag(true);
-        sendMotd(fd, clients[fd]);
+        sendMotd(fd, clients[fd], _port, _fds.size() - 2);
       }
     }
     line.clear();
