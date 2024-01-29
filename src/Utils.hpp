@@ -26,4 +26,8 @@ void printArg(char const *str, T arg) {
 
 std::string intToString(int value);
 
+bool isValidNick(std::string nickname);
+
+std::vector<std::string> commaSplit(std::string str);
+
 #endif

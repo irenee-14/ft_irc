@@ -35,7 +35,6 @@ const std::string makeModeReply(const Client client, std::string channel,
 
   for (unsigned int i = 0; i < modes.size(); ++i) {
     if (modes[i]._arg != "") se += " " + modes[i]._arg;
-    // !!!!! ':' 마지막에 붙여야하는지 고민해보기
   }
   se += "\r\n";
   return (se);

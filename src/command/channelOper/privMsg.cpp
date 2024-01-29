@@ -43,9 +43,12 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
     std::string se = ":" + nickname + "!" + username + "@" + servername + " " +
                      cmd + " " + target + " :" + message + "\r\n";
     sendString(se, users);
+  } else {
+    // :irc.local 403 root #asdfasdf :No such channel
+    const std::string se = ":" + SERVER_NAME + " 403 " + nickname + " " +
+                           target + " :No such channel\r\n";
+    sendString(se, fd);
   }
-  // !!!!!!else
-  // 채널이 없는 경우
 }
 
 void Server::privateMsg(int fd, std::vector<std::string> tokens) {

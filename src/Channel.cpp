@@ -84,10 +84,14 @@ std::string Channel::getModes(int fd) const {
 
 // ----------------------------------------------------------------------------
 
+bool Channel::getKeyMode() const { return (this->_mode[k]); }
+
 std::string Channel::getKey() const {
   if (this->_key.empty()) return ("");
   return (this->_key);
 }
+
+// ------------------------------------------------------------------------------
 
 int Channel::getLimit() const { return (this->_limit); }
 
