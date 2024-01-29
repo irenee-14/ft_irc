@@ -39,7 +39,8 @@ void Server::join(int fd, std::vector<std::string> tokens) {
     // invited 확인
     if (channels[channel_idx].isInvite(fd) < 0) {
       // password mode 확인
-      if (channels[channel_idx].getKey() != password) {
+      if (channels[channel_idx].getKeyMode() &&
+          channels[channel_idx].getKey() != password) {
         const std::string se =
             ":" + SERVER_NAME + " 475 " + nickname + " " + channel +
             " :Cannot join channel (incorrect channel key)\r\n";

@@ -16,6 +16,11 @@ Server::Server(void) {}
 Server::Server(char** argv) {
   this->_port = std::atoi(argv[1]);
   this->_password = argv[2];
+  int port = std::atoi(argv[1]);
+  if (port < 1024 || port > 49151) {
+    throw std::string("port number must be between 1024 and 49151");
+  }
+
   // 서버 소켓 생성
   _serv_fd = socket(PF_INET, SOCK_STREAM, 0);
   if (this->_serv_fd == -1) throw std::string("socket()");

@@ -54,7 +54,7 @@ class Server {
   std::map<std::string, int> _command_list;
 
   // -------------------------------------------------------------
-  // ????????clients fd 그대로 쓸 수 있는거 확인해서 바꾸기
+
   std::map<int, Client> clients;
   std::vector<Channel> channels;
 
@@ -134,7 +134,7 @@ class Server {
   void nick(int fd, std::string nickname);
   void pass(int fd, std::vector<std::string> tokens);
   void pong(int fd);
-  void quit(int fd);
+  void quit(int fd, std::string msg);
   void user(int fd, std::vector<std::string> tokens);
 
   // ------------------- optional Message -----------------------

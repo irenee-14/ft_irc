@@ -38,7 +38,16 @@ void Server::kick(int fd, std::vector<std::string> tokens) {
         return;
       }
 
-      // 보내려는 유저가 없으면 에러
+      // kick하려는 target이 channel에 없으면 에러
+      if (isUser(target) >= 0) {
+        se = ":" + SERVER_NAME + " 441 " + nickname + " " + target + " " +
+             channel + " :They aren't on that channel\r\n";
+
+        sendString(se, fd);
+        return;
+      }
+
+      // kick하려는 target이 존재하지 않으면 에러
       se = ":" + SERVER_NAME + " 401 " + nickname + " " + target +
            " :No such nick\r\n";
     } else {
@@ -46,7 +55,11 @@ void Server::kick(int fd, std::vector<std::string> tokens) {
            " :You must be a channel operator\r\n";
     }
     sendString(se, fd);
+  } else {
+    // :irc.local 403 root #asdfasdf :No such channel
+    const std::string se = ":" + SERVER_NAME + " 403 " + nickname + " " +
+                           channel + " :No such channel\r\n";
+
+    sendString(se, fd);
   }
-  // !!!!! else
-  // 채널이 없는 경우???
 }

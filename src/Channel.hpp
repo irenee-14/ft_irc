@@ -51,7 +51,9 @@ class Channel {
 
   std::string getModes(int fd) const;
 
+  bool getKeyMode() const;
   std::string getKey() const;
+
   int getLimit() const;
 
   bool getTopicMode() const;

@@ -80,7 +80,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
       motd(fd);
       break;
     case QUIT:
-      quit(fd);
+      quit(fd, tokens[1]);
       break;
     default:
       break;
