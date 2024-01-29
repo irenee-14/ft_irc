@@ -143,6 +143,7 @@ class Server {
   void whois(int fd, std::string target);
   void sendWelcome(int fd, Client client);
   void motd(int fd);
+  void bot(int fd, std::string nickname, std::string msg);
 
   // =============================================================
 };
