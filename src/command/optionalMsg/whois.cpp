@@ -10,19 +10,17 @@ void Server::whois(int fd, std::string targets) {
   const std::string nickname = clients[fd].getNick();
   const std::string username = clients[fd].getUser();
   const std::string realname = clients[fd].getRealName();
+  const std::vector<std::string> targetList = commaSplit(targets);
 
   // WHOIS asdfasdf
   // :irc.local 401 root asdfasdf :No such nick
   // :irc.local 318 root asdfasdf :End of /WHOIS list.
-  int comma_index = -1;
-  targets = targets + ",";
-  while (true) {
-    int start_index = comma_index + 1;
-    comma_index = targets.find(',', comma_index + 1);
-    if (comma_index < 0) break;
+  //   int comma_index = -1;
+  //   targets = targets + ",";
 
-    std::string target = targets.substr(start_index, comma_index - start_index);
-    std::cout << "target: " << target << std::endl;
+  for (std::vector<std::string>::const_iterator it = targetList.begin();
+       it != targetList.end(); ++it) {
+    std::string target = *it;
 
     if (isUser(target) < 0) {
       std::string se = ":" + SERVER_NAME + " 401 " + nickname + " " + target +
@@ -59,4 +57,3 @@ void Server::whois(int fd, std::string targets) {
     sendString(se, fd);
   }
 }
-// ????????/자기자신한테만 출력하는거 두개 아니었나?
