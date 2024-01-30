@@ -56,7 +56,7 @@ void Server::executeCommand(int fd, std::vector<std::string> tokens) {
       join(fd, tokens);
       break;
     case PART:
-      part(fd, tokens[1]);
+      part(fd, tokens);
       break;
     case PRIVMSG:
       privateMsg(fd, tokens);
