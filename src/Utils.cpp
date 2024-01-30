@@ -59,8 +59,10 @@ bool isValidNick(std::string nickname) {
 }
 
 // -------------------------------------------------------------
+// flag == 0 : 중복 제거
+// flag == 1 : 중복 허용
 
-std::vector<std::string> commaSplit(std::string str) {
+std::vector<std::string> splitComma(std::string str, int flag) {
   std::vector<std::string> result;
   std::string temp;
 
@@ -72,17 +74,25 @@ std::vector<std::string> commaSplit(std::string str) {
 
   while (ss.get(c)) {
     if (c == ',') {
-      if (!temp.empty() &&
-          (std::find(result.begin(), result.end(), temp) == result.end())) {
-        result.push_back(temp);
+      if (!temp.empty()) {
+        if (flag == 0) {
+          if (std::find(result.begin(), result.end(), temp) == result.end())
+            result.push_back(temp);
+        } else
+          result.push_back(temp);
         temp.clear();
       }
     } else
       temp += c;
   }
-  if (!temp.empty() &&
-      (std::find(result.begin(), result.end(), temp) == result.end()))
-    result.push_back(temp);
+  if (!temp.empty()) {
+    if (flag == 0) {
+      if (std::find(result.begin(), result.end(), temp) == result.end())
+        result.push_back(temp);
+    } else
+      result.push_back(temp);
+    temp.clear();
+  }
   ss.str("");
   return (result);
 }
