@@ -3,7 +3,7 @@
 #include <algorithm>  // find
 
 void ft_write(int __fd, const void *__buf, size_t __nbyte) {
-  size_t len = write(__fd, __buf, __nbyte);
+  int len = write(__fd, __buf, __nbyte);
   if (len < 0) throw std::string("write faild");
 }
 
@@ -87,7 +87,7 @@ std::vector<std::string> commaSplit(std::string str) {
   return (result);
 }
 
-std::vector<std::string> spaceSplit(std::string str) {
+std::vector<std::string> splitSpace(std::string str) {
   std::stringstream ss(str);
   std::string token;
   std::vector<std::string> tokens;

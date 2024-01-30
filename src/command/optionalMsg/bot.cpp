@@ -65,7 +65,7 @@ void game(int fd, std::string nickname, int choice) {
 
 void Server::bot(int fd, std::string nickname, std::string msg) {
   std::string command[4] = {"HI", "HELP", "REC", "GAME"};
-  std::vector<std::string> tokens = spaceSplit(msg);
+  std::vector<std::string> tokens = splitSpace(msg);
 
   for (size_t i = 0; i < tokens[0].length(); i++) {
     tokens[0][i] = std::toupper(tokens[0][i]);
