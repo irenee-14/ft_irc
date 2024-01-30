@@ -26,11 +26,17 @@ void printArg(char const *str, T arg) {
   ft_write(1, "\n", 1);
 }
 
+// ---------------------------------------------------
+
 std::string intToString(int value);
+int stringToInt(std::string str);
+
+// ---------------------------------------------------
 size_t findCRLF(std::string buf);
 
 bool isValidNick(std::string nickname);
 
 std::vector<std::string> commaSplit(std::string str);
+std::vector<std::string> spaceSplit(std::string str);
 
 #endif

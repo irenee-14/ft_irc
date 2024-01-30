@@ -61,7 +61,7 @@ std::string Server::processModeL(std::vector<std::string>::iterator& it,
                                  Channel& channel, bool isAddMode) {
   // channel에 limit 추가
   if (isAddMode) {
-    int retLimit = std::atoi((*it).c_str());
+    int retLimit = stringToInt(*it);
     channel.setLimit(retLimit);
     it++;
     return (intToString(retLimit));

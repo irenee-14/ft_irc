@@ -25,6 +25,9 @@ std::string intToString(int value) {
   return ss.str();
 }
 
+int stringToInt(std::string str) { return (std::atoi(str.c_str())); }
+
+// -------------------------------------------------------------
 size_t findCRLF(std::string buf) {
   size_t crPos = buf.find("\r");
   size_t lfPos = buf.find("\n");
@@ -32,6 +35,7 @@ size_t findCRLF(std::string buf) {
   if (crPos == std::string::npos) return lfPos;
   return std::min(crPos, lfPos);
 }
+
 // -------------------------------------------------------------
 
 bool isSpecialChar(char c) {
@@ -81,4 +85,15 @@ std::vector<std::string> commaSplit(std::string str) {
     result.push_back(temp);
   ss.str("");
   return (result);
+}
+
+std::vector<std::string> spaceSplit(std::string str) {
+  std::stringstream ss(str);
+  std::string token;
+  std::vector<std::string> tokens;
+
+  while (getline(ss, token, ' ')) {
+    tokens.push_back(token);
+  }
+  return (tokens);
 }
