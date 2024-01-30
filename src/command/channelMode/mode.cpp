@@ -11,6 +11,11 @@ const std::string ERR_INVALIDMODEPARAM(const std::string nickname,
           " mode. Syntax: <" + rawMode + ">.\r\n");
 }
 
+bool isModeChar(const char c) {
+  if (c == 'o' || c == 'k' || c == 'l' || c == 'i' || c == 't') return (true);
+  return (false);
+}
+
 // ----------------------------------------------------------------------
 
 const std::string makeModeReply(const Client client, std::string channel,
@@ -80,7 +85,8 @@ void Server::mode(int fd, std::vector<std::string> tokens) {
 
     // 필요한 인자가 다 있고, operator가 아닐 경우
     else if (channels[channel_idx].isOperator(fd) < 0) {
-      if (!((mode == 'o' || mode == 'k') && it == modeArgs.end()) &&
+      if (isModeChar(mode) &&
+          !((mode == 'o' || mode == 'k') && it == modeArgs.end()) &&
           !(isAddMode && mode == 'l' && it == modeArgs.end())) {
         std::string un = isAddMode ? "" : "un";
         std::string se = ":" + SERVER_NAME + " 482 " + nickname + " " +
