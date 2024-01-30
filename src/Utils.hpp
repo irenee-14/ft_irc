@@ -29,6 +29,6 @@ size_t findCRLF(std::string buf);
 
 bool isValidNick(std::string nickname);
 
-std::vector<std::string> commaSplit(std::string str);
+std::vector<std::string> commaSplit(std::string str, int flag);
 
 #endif
