@@ -122,7 +122,7 @@ void Server::bot(int fd, std::string nickname, std::string msg) {
   switch (index + 1) {
     case 1:
       se2 = ":" + SERVER_NAME +
-            " Hello I am a bot. Please move on to the next page\r\n";
+            " [BOT] Hello I am a bot. Please move on to the next page\r\n";
       sendString(se2, fd);
       bot_msg(fd, nickname, "Hello I am a bot.");
       bot_msg(fd, nickname,
