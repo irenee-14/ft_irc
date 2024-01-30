@@ -13,6 +13,10 @@ void Server::msg(int fd, std::vector<std::string> tokens, std::string cmd) {
   // PRIVMSG target :babo
   // target이 채널이 아니면 target에게 메시지 보내기
   if (target[0] != '#') {
+    if (target == "BOT" || target == "bot") {
+      bot(fd, nickname, message);
+      return;
+    }
     // users에서 user 찾기
     int target_fd = isUser(target);
 

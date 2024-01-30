@@ -45,7 +45,7 @@ class Server {
   int _serv_fd;
   struct sockaddr_in _serv_adr;
   std::vector<struct pollfd> _fds;
-  std::string _read_buf;
+  std::map<int, std::string> _read_buf;
 
   // -------------------------------------------------------------
 
@@ -79,9 +79,9 @@ class Server {
   int getServFd() const;
   const std::vector<struct pollfd> getPollFds() const;
 
-  std::string getReadBuf() const;
-  void setReadBuf(std::string const& buf);
-  void clearReadBuf();
+  std::string getReadBuf(int fd);
+  void setReadBuf(int fd, std::string const& buf);
+  void clearReadBuf(int fd);
 
   // --------------------------- is ------------------------------
 
@@ -143,6 +143,7 @@ class Server {
   void whois(int fd, std::string target);
   void sendWelcome(int fd, Client client);
   void motd(int fd);
+  void bot(int fd, std::string nickname, std::string msg);
 
   // =============================================================
 };

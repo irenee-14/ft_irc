@@ -2,15 +2,20 @@
 
 #include <algorithm>  // find
 
+void ft_write(int __fd, const void *__buf, size_t __nbyte) {
+  int len = write(__fd, __buf, __nbyte);
+  if (len < 0) throw std::string("write faild");
+}
+
 void sendString(std::string str, int fd) {
-  write(1, str.c_str(), str.length());
-  write(fd, str.c_str(), str.length());
+  ft_write(1, str.c_str(), str.length());
+  ft_write(fd, str.c_str(), str.length());
 }
 
 void sendString(std::string str, std::vector<int> fds) {
   for (std::vector<int>::iterator it = fds.begin(); it != fds.end(); ++it) {
-    write(1, str.c_str(), str.length());
-    write(*it, str.c_str(), str.length());
+    ft_write(1, str.c_str(), str.length());
+    ft_write(*it, str.c_str(), str.length());
   }
 }
 
@@ -20,6 +25,9 @@ std::string intToString(int value) {
   return ss.str();
 }
 
+int stringToInt(std::string str) { return (std::atoi(str.c_str())); }
+
+// -------------------------------------------------------------
 size_t findCRLF(std::string buf) {
   size_t crPos = buf.find("\r");
   size_t lfPos = buf.find("\n");
@@ -27,6 +35,7 @@ size_t findCRLF(std::string buf) {
   if (crPos == std::string::npos) return lfPos;
   return std::min(crPos, lfPos);
 }
+
 // -------------------------------------------------------------
 
 bool isSpecialChar(char c) {
@@ -53,7 +62,7 @@ bool isValidNick(std::string nickname) {
 // flag == 0 : 중복 제거
 // flag == 1 : 중복 허용
 
-std::vector<std::string> commaSplit(std::string str, int flag) {
+std::vector<std::string> splitComma(std::string str, int flag) {
   std::vector<std::string> result;
   std::string temp;
 
@@ -86,4 +95,15 @@ std::vector<std::string> commaSplit(std::string str, int flag) {
   }
   ss.str("");
   return (result);
+}
+
+std::vector<std::string> splitSpace(std::string str) {
+  std::stringstream ss(str);
+  std::string token;
+  std::vector<std::string> tokens;
+
+  while (getline(ss, token, ' ')) {
+    tokens.push_back(token);
+  }
+  return (tokens);
 }

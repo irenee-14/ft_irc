@@ -102,13 +102,15 @@ const std::vector<struct pollfd> Server::getPollFds() const {
   return (this->_fds);
 }
 
-std::string Server::getReadBuf() const { return (this->_read_buf); }
+std::string Server::getReadBuf(int fd) { return (this->_read_buf[fd]); }
 
-void Server::setReadBuf(std::string const& buf) { this->_read_buf += buf; }
+void Server::setReadBuf(int fd, std::string const& buf) {
+  this->_read_buf[fd] += buf;
+}
 
-void Server::clearReadBuf() {
-  this->_read_buf.clear();
-  this->_read_buf = "";
+void Server::clearReadBuf(int fd) {
+  this->_read_buf[fd].clear();
+  this->_read_buf[fd] = "";
 }
 
 // ----------------------------------------------------------------------
@@ -197,7 +199,8 @@ void Server::recvMsg(int fd) {
   int recv_len;
   recv_len = recv(fd, buf, BUF_SIZE, 0);
   buf[recv_len] = '\0';
-  // write(1, buf, recv_len);
+  //  std::cout << "cur buf : " << this->getReadBuf(fd) << std::endl;
+  //  std::cout << "input buf : " << buf << std::endl;
 
   if (recv_len < 0) {
     printArg("recv failed", "");
@@ -207,21 +210,22 @@ void Server::recvMsg(int fd) {
     this->disconnectClient(fd);
     return;
   } else {
-    this->setReadBuf(buf);
+    this->setReadBuf(fd, buf);
 
-    if (findCRLF(this->getReadBuf()) != std::string::npos) {
-      write(1, buf, recv_len);
+    if (findCRLF(this->getReadBuf(fd)) != std::string::npos) {
+      ft_write(1, buf, recv_len);
       printArg("\n-----------------------------------------------\n", "");
       try {
-        checkCommand(fd, this->getReadBuf());
-        this->clearReadBuf();
+        checkCommand(fd, this->getReadBuf(fd));
+        this->clearReadBuf(fd);
       } catch (std::string exception) {
+        printArg("Error : ", exception);
         // client에게도 에러 메시지 보내줘야함, pass 불일치
         std::string se =
             "ERROR Closing link: [Access denied by configuration]\r\n";
         sendString(se, fd);
         disconnectClient(fd);
-        this->clearReadBuf();
+        this->clearReadBuf(fd);
       }
       printArg("\n===============================================\n", "");
     }

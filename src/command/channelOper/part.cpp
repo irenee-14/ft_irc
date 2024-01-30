@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 void Server::part(int fd, std::string channelString) {
-  const std::vector<std::string> channel_vec = commaSplit(channelString, 0);
+  const std::vector<std::string> channel_vec = splitComma(channelString, 0);
   for (unsigned int i = 0; i < channel_vec.size(); ++i) {
     const std::string channel = channel_vec[i];
     const std::string channelNoHash = channel.substr(1, channel.size() - 1);

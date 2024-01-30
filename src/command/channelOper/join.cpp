@@ -27,9 +27,9 @@ const std::string Server::userList(const Channel& channel) {
 // -------------------------------------------------------------
 
 void Server::join(int fd, std::vector<std::string> tokens) {
-  const std::vector<std::string> channel_vec = commaSplit(tokens[1], 0);
+  const std::vector<std::string> channel_vec = splitComma(tokens[1], 0);
   const std::vector<std::string> password_vec =
-      tokens.size() > 2 ? commaSplit(tokens[2], 1) : std::vector<std::string>();
+      tokens.size() > 2 ? splitComma(tokens[2], 1) : std::vector<std::string>();
 
   const std::string nickname = clients[fd].getNick();
   const std::string username = clients[fd].getUser();
