@@ -10,7 +10,7 @@ void Server::whois(int fd, std::string targets) {
   const std::string nickname = clients[fd].getNick();
   const std::string username = clients[fd].getUser();
   const std::string realname = clients[fd].getRealName();
-  const std::vector<std::string> targetList = commaSplit(targets);
+  const std::vector<std::string> targetList = commaSplit(targets, 0);
 
   // WHOIS asdfasdf
   // :irc.local 401 root asdfasdf :No such nick
