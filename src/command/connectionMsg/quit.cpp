@@ -27,6 +27,7 @@ void Server::quit(int fd, std::string msg) {
       if (channels[i].getUserFds().empty()) {
         channels.erase(channels.begin() + i);
       }
+      i--;
     }
   }
   // server에 quit 메시지 보내기
