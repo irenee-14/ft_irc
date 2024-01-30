@@ -2,15 +2,20 @@
 
 #include <algorithm>  // find
 
+void ft_write(int __fd, const void *__buf, size_t __nbyte) {
+  size_t len = write(__fd, __buf, __nbyte);
+  if (len < 0) throw std::string("write faild");
+}
+
 void sendString(std::string str, int fd) {
-  write(1, str.c_str(), str.length());
-  write(fd, str.c_str(), str.length());
+  ft_write(1, str.c_str(), str.length());
+  ft_write(fd, str.c_str(), str.length());
 }
 
 void sendString(std::string str, std::vector<int> fds) {
   for (std::vector<int>::iterator it = fds.begin(); it != fds.end(); ++it) {
-    write(1, str.c_str(), str.length());
-    write(*it, str.c_str(), str.length());
+    ft_write(1, str.c_str(), str.length());
+    ft_write(*it, str.c_str(), str.length());
   }
 }
 

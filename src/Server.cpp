@@ -210,12 +210,13 @@ void Server::recvMsg(int fd) {
     this->setReadBuf(buf);
 
     if (findCRLF(this->getReadBuf()) != std::string::npos) {
-      write(1, buf, recv_len);
+      ft_write(1, buf, recv_len);
       printArg("\n-----------------------------------------------\n", "");
       try {
         checkCommand(fd, this->getReadBuf());
         this->clearReadBuf();
       } catch (std::string exception) {
+        printArg("Error : ", exception);
         // client에게도 에러 메시지 보내줘야함, pass 불일치
         std::string se =
             "ERROR Closing link: [Access denied by configuration]\r\n";
