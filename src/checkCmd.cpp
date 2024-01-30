@@ -95,6 +95,7 @@ void Server::checkCommand(int fd, std::string buf) {
 
   while (std::getline(ss, line)) {
     std::string str = line.substr(0, findCRLF(line));
+    if (str == "") return;
 
     if (str.find("CAP LS") == 0) {
       const char* se = "CAP * LS\r\n";
