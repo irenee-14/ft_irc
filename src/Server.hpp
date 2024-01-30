@@ -121,7 +121,7 @@ class Server {
   void join(int fd, std::vector<std::string> tokens);
   void kick(int fd, std::vector<std::string> tokens);
   void list(int fd, std::vector<std::string> tokens);
-  void part(int fd, std::string channelString);
+  void part(int fd, std::vector<std::string> tokens);
 
   void privateMsg(int fd, std::vector<std::string> tokens);
   void msg(int fd, std::vector<std::string> tokens, std::string cmd);

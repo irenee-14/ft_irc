@@ -1,6 +1,9 @@
 #include "Server.hpp"
 
-void Server::part(int fd, std::string channelString) {
+void Server::part(int fd, std::vector<std::string> tokens) {
+  const std::string channelString = tokens[1];
+  const std::string partMessage = tokens.size() > 2 ? tokens[2] : "";
+
   const std::vector<std::string> channel_vec = splitComma(channelString, 0);
   for (unsigned int i = 0; i < channel_vec.size(); ++i) {
     const std::string channel = channel_vec[i];
@@ -24,9 +27,15 @@ void Server::part(int fd, std::string channelString) {
       sendString(se, fd);
       continue;
     } else {
-      std::string se =
-          ":" + nickname + "!" + username + " PART :" + channel + "\r\n";
-      sendString(se, channels[channel_idx].getUserFds());
+      if (partMessage != "") {
+        std::string se = ":" + nickname + "!" + username + " PART " + channel +
+                         " :" + partMessage + "\r\n";
+        sendString(se, channels[channel_idx].getUserFds());
+      } else {
+        std::string se =
+            ":" + nickname + "!" + username + " PART :" + channel + "\r\n";
+        sendString(se, channels[channel_idx].getUserFds());
+      }
 
       // users에서 지우기
       channels[channel_idx].removeUser(fd);
