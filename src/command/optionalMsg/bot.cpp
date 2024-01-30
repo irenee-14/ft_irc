@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <fstream>
 
 #include "Server.hpp"
@@ -27,58 +28,18 @@ void botHelp(int fd, std::string nickname) {
   data.close();
 }
 
-std::vector<std::string> splitString(std::string str) {
-  std::stringstream ss(str);
-  std::string token;
-  std::vector<std::string> tokens;
-
-  while (getline(ss, token, ' ')) {
-    tokens.push_back(token);
-  }
-  return (tokens);
-}
-
 void recommand(int fd, std::string nickname) {
   srand(time(NULL));
-  int random = rand() % 10;
+  int random = rand() % 15;
 
   std::string se = "오늘 당신의 저녁은?!?! : ";
-  switch (random + 1) {
-    case 1:
-      se += "치킨";
-      break;
-    case 2:
-      se += "피자";
-      break;
-    case 3:
-      se += "보쌈";
-      break;
-    case 4:
-      se += "마라탕 && 꿔바로우";
-      break;
-    case 5:
-      se += "국밥";
-      break;
-    case 6:
-      se += "돈까스";
-      break;
-    case 7:
-      se += "샤브샤브";
-      break;
-    case 8:
-      se += "모모유부";
-      break;
-    case 9:
-      se += "고추바사삭";
-      break;
-    case 10:
-      se += "프랭크버거";
-      break;
-    default:
-      se += "김치찌개";
-      break;
-  }
-  bot_msg(fd, nickname, se);
+  std::string food[15] = {
+      "뿌링클",          "푸라닭",        "도미노피자",      "보쌈",
+      "마라탕",          "주먹고기",      "치마오",          "모모유부",
+      "정통집",          "광수육회",      "감탄계 숯불치킨", "이모네 전",
+      "스파게티 스토리", "주박사 닭갈비", "뼈다귀 해장국"};
+
+  bot_msg(fd, nickname, se + food[random]);
 }
 
 void game(int fd, std::string nickname, int choice) {
@@ -104,7 +65,7 @@ void game(int fd, std::string nickname, int choice) {
 
 void Server::bot(int fd, std::string nickname, std::string msg) {
   std::string command[4] = {"HI", "HELP", "REC", "GAME"};
-  std::vector<std::string> tokens = splitString(msg);
+  std::vector<std::string> tokens = spaceSplit(msg);
 
   for (size_t i = 0; i < tokens[0].length(); i++) {
     tokens[0][i] = std::toupper(tokens[0][i]);
@@ -140,7 +101,7 @@ void Server::bot(int fd, std::string nickname, std::string msg) {
         bot_msg(fd, nickname, "Please enter in the form : GAME [choice]");
         bot_msg(fd, nickname, "가위(1), 바위(2), and 보(3)");
       } else
-        game(fd, nickname, std::atoi(tokens[1].c_str()));
+        game(fd, nickname, stringToInt(tokens[1]));
       break;
     default:
       bot_msg(fd, nickname,
@@ -148,24 +109,3 @@ void Server::bot(int fd, std::string nickname, std::string msg) {
               "use it.");
   }
 }
-
-// hi/hello
-// 사용 방법 소개, 원하는 숫자를 입력하면 저녁 메뉴를 추천
-
-// help/HELP 모르는 명령어. help로 사용할 수 있는 명령어
-
-// 저메추
-// 가위바위보
-
-// if (msg == )
-// 숫자 입력
-// 랜덤하게 메뉴 출력
-// std::stringstream ss;
-// ss << msg;
-
-// std::string se;
-// 저메추,
-
-// }
-
-// bot_msg(fd, nickname, se);
