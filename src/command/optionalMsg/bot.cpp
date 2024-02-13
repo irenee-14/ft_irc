@@ -49,6 +49,12 @@ void game(int fd, std::string nickname, int choice) {
   std::string se;
   std::string choices[] = {"가위", "바위", "보"};
 
+  if (choice != 1 && choice != 2 && choice != 3) {
+    bot_msg(fd, nickname, "Please enter in the form : GAME [choice]");
+    bot_msg(fd, nickname, "가위(1), 바위(2), and 보(3)");
+    return;
+  }
+
   bot_msg(
       fd, nickname,
       "Bot's choice: " + choices[com - 1] + " (" + intToString(com) + ")\r\n");

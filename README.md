@@ -59,6 +59,8 @@
 ## Optional Message
 - userhost
 - whois
+- motd
+- bot
 
 ## 체크리스트
 - user 존재 여부
@@ -70,7 +72,6 @@
 
 - target의 존재 여부(client/channel)
 - target이 채널에 속해있는지 여부
-- target이
 
 - 필요한 인자가 모두 들어왔는지
 - 별도로 설정되어 있는 모드가 있는지
